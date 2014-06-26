@@ -1,16 +1,33 @@
 
-class Maintenance < ActiveRecord::Base
-  validates_presence_of :asset_id 
-  validates_presence_of :complaint_date 
+class MaintenanceDetail < ActiveRecord::Base
+  validates_presence_of :maintenance_id  
+  validates_presence_of :component_id  
   
-  belongs_to :asset 
+  belongs_to :maintenance
+  belongs_to :component  
   
+  validate :maintenance_is_not_confirmed_upon_save
+  
+  def maintenance_is_not_confirmed_upon_save
+    return if maintenance_id.nil?
+    
+    if maintenance.is_confirmed?
+      self.errors.add(:generic_errors, "maintenance sudah di konfirmasi")
+      return self 
+    end
+  end
  
   
   def self.create_object( params ) 
     new_object           = self.new
-    new_object.asset_id            = params[:asset_id] 
-    new_object.complaint_date            = params[:complaint_date] 
+    
+    
+    
+    
+    new_object.maintenance_id            = params[:maintenance_id] 
+    
+    
+    new_object.component_id            = params[:component_id] 
     new_object.complaint            = params[:complaint]
     new_object.complaint_case            = params[:complaint_case]
      
@@ -69,16 +86,8 @@ class Maintenance < ActiveRecord::Base
       return self 
     end
     
-    
-    if self.maintenance_details.count != 0 
-      self.errors.add(:generic_errors, "Tidak ada maintenance detail")
-      return self 
-    end
-    
     self.is_confirmed = true 
     self.confirmed_at = params[:confirmed_at ]
-    
-    
     self.save 
   end
   

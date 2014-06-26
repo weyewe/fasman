@@ -2,9 +2,7 @@ class Customer < ActiveRecord::Base
   attr_accessible :name, :address, :email  
    
   validates_presence_of :name  
-  validates_uniqueness_of :name 
-  has_many :items
-  has_many :contract_maintenances
+  validates_uniqueness_of :name  
   
  
   

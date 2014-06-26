@@ -14,54 +14,20 @@
   
 =end
 class Item < ActiveRecord::Base
-   
-  validates_presence_of :customer_id, :item_type_id   
-  belongs_to :customer
-  belongs_to :item_type 
+  validates_uniqueness_of :sku
   
-  validate :valid_item_type_id
-  
-  def valid_item_type_id
-    return if not  self.item_type_id.present? 
-    
-    object  = ItemType.find_by_id self.item_type_id
-    if object.nil?
-      self.errors.add(:item_type_id, "Harus ada")
-      return self 
-    end
-  end
-  
+  has_many :components, :through => :compatibilities 
+  has_many :compatibilities 
   
   
  
   
   def self.create_object( params ) 
     new_object           = self.new
-    new_object.customer_id            = params[:customer_id]
-    new_object.item_type_id                = params[:item_type_id    ]
-    
+    new_object.sku            = params[:sku] 
     new_object.description            = params[:description]
-    new_object.manufactured_at        = params[:manufactured_at]
-    new_object.warranty_expiry_date  = params[:warranty_expiry_date]
      
-    
-    if new_object.save
-      
-      now = DateTime.now
-      year = now.year
-      month = now.month 
-      
-      
-      beginning_of_the_year_datetime = now.beginning_of_year
-      end_of_the_year_datetime = (now + 1.year).beginning_of_year - 1.second
-      
-      total_item_created_in_current_year = new_object.customer.items.where(
-        :created_at => beginning_of_the_year_datetime..end_of_the_year_datetime
-      ).count 
-      
-      new_object.code = "#{year}/#{month}/#{new_object.customer_id}/#{total_item_created_in_current_year}"
-      new_object.save 
-    end
+    new_object.save
     
     return new_object
   end
@@ -71,13 +37,8 @@ class Item < ActiveRecord::Base
   
   def update_object(params)
     
-    self.customer_id  = params[:customer_id]
-    self.item_type_id      = params[:item_type_id    ]
-    
-    self.description  = params[:description]
-    self.manufactured_at  = params[:manufactured_at]
-    self.warranty_expiry_date  = params[:warranty_expiry_date] 
-    
+    self.sku  = params[:sku]
+    self.description      = params[:description    ]
     self.save
     
     return self
@@ -85,7 +46,7 @@ class Item < ActiveRecord::Base
   
   def delete_object
     
-    
+    # check if there is stock mutations. if yes, return false , don't delete
     
     self.is_deleted  = true 
     self.save  

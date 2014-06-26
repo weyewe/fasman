@@ -1,15 +1,10 @@
 class CreateItems < ActiveRecord::Migration
   def change
     create_table :items do |t|
-      
-      t.integer :customer_id 
-      t.integer :item_type_id 
-      
-      t.string :code 
+     
+      t.string :sku 
       t.text :description
-      
-      t.datetime :manufactured_at 
-      t.datetime :warranty_expiry_date 
+      t.integer :quantity_ready , :default =>  0 
       
       t.boolean :is_deleted , :default => false 
 
