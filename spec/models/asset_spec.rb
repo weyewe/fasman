@@ -30,7 +30,7 @@ describe Asset do
     )
     
     
-    @customer = Customer.create_object(
+    @contact = Contact.create_object(
       :name     => "Awesome Custom",
       :address  => "address",
       :pic      => "andi sitorus",
@@ -56,7 +56,7 @@ describe Asset do
     it "should not allow asset creation" do
       asset = Asset.create_object(
         :machine_id  => @machine2.id, 
-        :customer_id => @customer.id,
+        :contact_id => @contact.id,
         :description =>  "Awesome aasset",
         :code        =>  "382yuekljaaawf"
       )
@@ -69,7 +69,7 @@ describe Asset do
   it "should be allowed to create asset" do
     asset = Asset.create_object(
       :machine_id  => @machine.id, 
-      :customer_id => @customer.id,
+      :contact_id => @contact.id,
       :description =>  "Awesome asset",
       :code        =>  "382yuekljwf"
     )
@@ -81,7 +81,7 @@ describe Asset do
     before(:each) do
       @asset = Asset.create_object(
         :machine_id  => @machine.id, 
-        :customer_id => @customer.id,
+        :contact_id => @contact.id,
         :description =>  "Awesome asset",
         :code        =>  "382yuekljwf"
       )

@@ -30,7 +30,7 @@ describe Asset do
     )
     
     
-    @customer = Customer.create_object(
+    @contact = Contact.create_object(
       :name     => "Awesome Custom",
       :address  => "address",
       :pic      => "andi sitorus",
@@ -40,7 +40,7 @@ describe Asset do
     
     @asset = Asset.create_object(
       :machine_id  => @machine.id, 
-      :customer_id => @customer.id,
+      :contact_id => @contact.id,
       :description =>  "Awesome asset",
       :code        =>  "382yuekljwf"
     )

@@ -1,9 +1,9 @@
 
 class Asset < ActiveRecord::Base
-  validates_presence_of :machine_id, :customer_id, :code 
+  validates_presence_of :machine_id, :contact_id, :code 
   validates_uniqueness_of :code
   
-  belongs_to :customer
+  belongs_to :contact
   belongs_to :machine 
   has_many :maintenances
   has_many :asset_details 
@@ -26,7 +26,7 @@ class Asset < ActiveRecord::Base
   def self.create_object( params ) 
     new_object           = self.new
     new_object.machine_id            = params[:machine_id] 
-    new_object.customer_id            = params[:customer_id] 
+    new_object.contact_id            = params[:contact_id] 
     new_object.description            = params[:description]
     new_object.code = params[:code]
     if new_object.save
@@ -47,7 +47,7 @@ class Asset < ActiveRecord::Base
   
   def update_object(params)
     
-    self.customer_id = params[:customer_id]
+    self.contact_id = params[:contact_id]
     self.description      = params[:description    ]
     self.code = params[:code]
     self.save

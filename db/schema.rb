@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140627075510) do
+ActiveRecord::Schema.define(version: 20140627125043) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20140627075510) do
 
   create_table "assets", force: true do |t|
     t.integer  "machine_id"
-    t.integer  "customer_id"
+    t.integer  "contact_id"
     t.string   "code"
     t.text     "description"
     t.boolean  "is_deleted",  default: false
@@ -47,6 +47,17 @@ ActiveRecord::Schema.define(version: 20140627075510) do
     t.integer  "machine_id"
     t.string   "name"
     t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "contacts", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_customer",      default: false
+    t.boolean  "is_supplier",      default: false
+    t.text     "address"
+    t.text     "shipping_address"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -94,8 +105,10 @@ ActiveRecord::Schema.define(version: 20140627075510) do
   create_table "items", force: true do |t|
     t.string   "sku"
     t.text     "description"
-    t.integer  "ready",       default: 0
-    t.boolean  "is_deleted",  default: false
+    t.integer  "pending_receival", default: 0
+    t.integer  "ready",            default: 0
+    t.integer  "pending_delivery", default: 0
+    t.boolean  "is_deleted",       default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -143,11 +156,68 @@ ActiveRecord::Schema.define(version: 20140627075510) do
     t.datetime "updated_at"
   end
 
+  create_table "purchase_order_details", force: true do |t|
+    t.integer  "purchase_order_id"
+    t.integer  "item_id"
+    t.decimal  "discount",          precision: 5, scale: 2, default: 0.0
+    t.decimal  "unit_price",        precision: 9, scale: 2, default: 0.0
+    t.integer  "quantity",                                  default: 0
+    t.integer  "pending_receival",                          default: 0
+    t.boolean  "is_confirmed",                              default: false
+    t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "purchase_orders", force: true do |t|
+    t.integer  "contact_id"
+    t.datetime "purchase_date"
+    t.text     "description"
+    t.decimal  "total",         precision: 12, scale: 2, default: 0.0
+    t.boolean  "is_confirmed",                           default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",                             default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "purchase_receival_details", force: true do |t|
+    t.integer  "purchase_receival_id"
+    t.integer  "purchase_order_detail_id"
+    t.integer  "quantity",                 default: 0
+    t.integer  "invoiced_quantity",        default: 0
+    t.boolean  "is_confirmed",             default: false
+    t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "purchase_receivals", force: true do |t|
+    t.integer  "purchase_order_id"
+    t.text     "description"
+    t.datetime "receival_date"
+    t.boolean  "is_confirmed",      default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",        default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "roles", force: true do |t|
     t.string   "name",        null: false
     t.string   "title",       null: false
     t.text     "description", null: false
     t.json     "the_role",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sales_order_details", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sales_orders", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -166,6 +236,18 @@ ActiveRecord::Schema.define(version: 20140627075510) do
     t.boolean  "is_deleted",      default: false
     t.boolean  "is_confirmed",    default: false
     t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "stock_mutations", force: true do |t|
+    t.integer  "item_id"
+    t.integer  "quantity"
+    t.integer  "case"
+    t.integer  "source_document_detail_id"
+    t.string   "source_document_detail"
+    t.integer  "item_case"
+    t.datetime "mutation_date"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
