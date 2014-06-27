@@ -38,6 +38,13 @@ class AssetDetail < ActiveRecord::Base
   end 
   
   def assign_initial_item( params ) 
+    compatibility_count = self.component.compatibilities.where(:item_id => params[:initial_item_id]).count
+    
+    if compatibility_count == 0
+      self.errors.add(:initial_item_id, "Tidak memiliki kompatibilitas")
+      return self 
+    end
+    
     self.initial_item_id = params[:initial_item_id]
     self.current_item_id = params[:initial_item_id]
     self.save 

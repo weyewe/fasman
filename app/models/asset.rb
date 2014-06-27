@@ -8,6 +8,19 @@ class Asset < ActiveRecord::Base
   has_many :maintenances
   has_many :asset_details 
   
+  
+  validate :machine_component_has_been_created
+  
+  
+  def machine_component_has_been_created
+    return if not self.machine_id.present? 
+    return if self.persisted? 
+    
+    if self.machine.components.count == 0 
+      self.errors.add(:generic_errors, "There is no component registered in the machine")
+      return self 
+    end
+  end
  
   
   def self.create_object( params ) 
@@ -48,14 +61,27 @@ class Asset < ActiveRecord::Base
       return self 
     end
     
+    if self.maintenances.count != 0 
+      self.errors.add(:generic_errors, "sudah ada maintenance")
+      return self 
+    end
     
     
-    self.is_deleted = true 
-    self.save  
+    
+    self.asset_details.each {|x| x.destroy }
+    self.destroy 
   end 
   
   
   def self.active_objects
     self.where(:is_deleted => false )
+  end
+  
+  def all_details_initialized?
+    return true if self.asset_details.where{
+                            initial_item_id.eq nil
+                          }.count == 0  
+                          
+    return false  
   end
 end

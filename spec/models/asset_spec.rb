@@ -40,6 +40,32 @@ describe Asset do
     
   end 
   
+  context "machine is not initialized" do
+    before(:each) do
+      @machine2 = Machine.create_object(
+        :name => "34242ahahawafaw",
+        :brand => "Yokokahahao",
+        :description => "awesome machine"
+      )
+    end
+    
+    it "should create machine" do
+      @machine2.should be_valid 
+    end
+    
+    it "should not allow asset creation" do
+      asset = Asset.create_object(
+        :machine_id  => @machine2.id, 
+        :customer_id => @customer.id,
+        :description =>  "Awesome aasset",
+        :code        =>  "382yuekljaaawf"
+      )
+      
+      asset.should_not be_valid
+      asset.errors.size.should_not == 0 
+    end
+  end
+  
   it "should be allowed to create asset" do
     asset = Asset.create_object(
       :machine_id  => @machine.id, 
@@ -65,6 +91,30 @@ describe Asset do
       @asset.asset_details.count.should == 1 
       
       @asset.asset_details.first.component_id.should == @component.id 
+    end
+    
+    
+    context "adding initial item into the asset detail" do
+      before(:each) do
+        @asset_detail = @asset.asset_details.first 
+      end
+      
+      it "should allow initial_item assignment" do
+        @asset_detail.assign_initial_item(
+          :initial_item_id => @item1.id 
+        )
+        
+        @asset_detail.errors.size.should == 0 
+        @asset_detail.initial_item_id.should == @item1.id
+      end
+      
+      it "should not allow assignment of item not in the copatibility" do
+        @asset_detail.assign_initial_item(
+          :initial_item_id => @item2.id 
+        )
+        
+        @asset_detail.errors.size.should_not == 0  
+      end
     end
     
     context "adding new component to the machine" do

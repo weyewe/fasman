@@ -48,22 +48,62 @@ class MaintenanceDetail < ActiveRecord::Base
   
   
   def validate_update_maintenance_result
-    return true
+    puts "\n\nInside validate_update_maintenance_result"
+    puts "inspection: #{self}"
+    puts "diagnosis_case: #{self.diagnosis_case}"
+    puts "solution_case: #{self.solution_case}"
+    
+    if is_replacement_required.present? and is_replacement_required?
+      if not replacement_item_id.present?
+        self.errors.add(:replacement_item_id, "harus ada")
+      end
+      
+      replacement_item = Item.find_by_id replacement_item_id
+      if replacement_item.nil?
+        self.errors.add(:replacement_item_id, "harus ada") 
+      end
+    end
+    
+   
+    
+    if not diagnosis_case.present?
+      self.errors.add(:diagnosis_case, "Harus ada")
+    else
+      if not [
+        DIAGNOSIS_CASE[:all_ok],
+        DIAGNOSIS_CASE[:require_fix],
+        DIAGNOSIS_CASE[:require_replacement],
+        ].include?(self.diagnosis_case)
+        self.errors.add(:diagnosis_case, "Harus valid")
+      end
+    end
+    
+    if not solution_case.present?
+      self.errors.add(:solution_case, "Harus ada")
+    else
+      if  not [
+        SOLUTION_CASE[:pending],
+        SOLUTION_CASE[:solved],
+        ].include?(self.solution_case)
+        self.errors.add(:solution_case, "Harus valid")
+      end
+    end
   end
   
   def update_maintenance_result( params ) 
+    puts "The params: #{params}"
     
     if self.maintenance.is_confirmed?
       self.errors.add(:generic_errors, "Maintenance sudah di konfirmasi")
       return self 
     end
     
-    self.diagnosis                  =  self.diagnosis
-    self.diagnosis_case             =  self.diagnosis_case          
-    self.solution                   =  self.solution                
-    self.solution_case              =  self.solution_case            
-    self.is_replacement_required    =  self.is_replacement_required 
-    self.replacement_item_id        =  self.replacement_item_id     
+    self.diagnosis                  =  params[:diagnosis                ]
+    self.diagnosis_case             =  params[:diagnosis_case           ]
+    self.solution                   =  params[:solution                 ]
+    self.solution_case              =  params[:solution_case            ]
+    self.is_replacement_required    =  params[:is_replacement_required  ]
+    self.replacement_item_id        =  params[:replacement_item_id      ]
     
     self.validate_update_maintenance_result 
     
@@ -93,8 +133,21 @@ class MaintenanceDetail < ActiveRecord::Base
     self.destroy
   end 
   
-  def confirm(params)
-    self.save 
+  def confirmable?
+     
+  end
+  
+  
+  def replacement_item
+    Item.find_by_id self.replacement_item_id
+  end
+  
+  def confirm 
+    if is_replacement_required?
+      selected_replacement_item = self.replacement_item
+      selected_replacement_item.ready -= 1 
+      selected_replacement_item.save 
+    end
   end
   
   
