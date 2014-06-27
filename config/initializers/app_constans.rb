@@ -112,3 +112,15 @@ SOLUTION_CASE = {
   :pending => 2,
   :solved =>  3    # 
 }
+
+
+STOCK_MUTATION_CASE= {
+  :addition => 1 , 
+  :deduction => 2 
+}
+
+STOCK_MUTATION_ITEM_CASE = {
+  :pending_receival => 1, 
+  :ready => 2, 
+  :pending_delivery => 3 
+}
