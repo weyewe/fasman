@@ -22,19 +22,12 @@ class MaintenanceDetail < ActiveRecord::Base
     new_object           = self.new
     
     
+
+
+    new_object.maintenance_id = params[:maintenance_id] 
+    new_object.component_id   = params[:component_id] 
     
-    
-    new_object.maintenance_id            = params[:maintenance_id] 
-    
-    
-    new_object.component_id            = params[:component_id] 
-    new_object.complaint            = params[:complaint]
-    new_object.complaint_case            = params[:complaint_case]
-     
-    if new_object.save
-      new_object.code  = ""
-      new_object.save 
-    end
+    new_object.save 
     
     return new_object
   end
@@ -44,13 +37,41 @@ class MaintenanceDetail < ActiveRecord::Base
   
   def update_object(params)
     
-    self.asset_id            = params[:asset_id] 
-    self.complaint_date            = params[:complaint_date] 
-    self.complaint            = params[:complaint]
-    self.complaint_case            = params[:complaint_case]
-    self.save
+    # self.asset_id            = params[:asset_id] 
+    # self.complaint_date            = params[:complaint_date] 
+    # self.complaint            = params[:complaint]
+    # self.complaint_case            = params[:complaint_case]
+    # self.save
+    # 
+    # return self
+  end
+  
+  
+  def validate_update_maintenance_result
+    return true
+  end
+  
+  def update_maintenance_result( params ) 
     
-    return self
+    if self.maintenance.is_confirmed?
+      self.errors.add(:generic_errors, "Maintenance sudah di konfirmasi")
+      return self 
+    end
+    
+    self.diagnosis                  =  self.diagnosis
+    self.diagnosis_case             =  self.diagnosis_case          
+    self.solution                   =  self.solution                
+    self.solution_case              =  self.solution_case            
+    self.is_replacement_required    =  self.is_replacement_required 
+    self.replacement_item_id        =  self.replacement_item_id     
+    
+    self.validate_update_maintenance_result 
+    
+    if self.errors.size == 0 
+      self.save
+    end
+    
+    return self 
   end
   
   def delete_object
@@ -69,25 +90,10 @@ class MaintenanceDetail < ActiveRecord::Base
       return self 
     end
     
-    
-    
-    self.is_deleted = true 
-    self.save  
+    self.destroy
   end 
   
   def confirm(params)
-    if self.is_confirmed?
-      self.errors.add(:generic_errors, "Sudah konfirmasi")
-      return self 
-    end
-    
-    if self.is_deleted?
-      self.errors.add(:generic_errors, "Sudah delete")
-      return self 
-    end
-    
-    self.is_confirmed = true 
-    self.confirmed_at = params[:confirmed_at ]
     self.save 
   end
   

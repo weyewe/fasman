@@ -11,10 +11,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140625063942) do
+ActiveRecord::Schema.define(version: 20140627075510) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "asset_details", force: true do |t|
+    t.integer  "asset_id"
+    t.integer  "component_id"
+    t.integer  "current_item_id"
+    t.integer  "initial_item_id"
+    t.integer  "maintenance_detail_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "assets", force: true do |t|
+    t.integer  "machine_id"
+    t.integer  "customer_id"
+    t.string   "code"
+    t.text     "description"
+    t.boolean  "is_deleted",  default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "compatibilities", force: true do |t|
+    t.integer  "item_id"
+    t.integer  "component_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "components", force: true do |t|
+    t.integer  "machine_id"
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "contract_items", force: true do |t|
     t.integer  "contract_maintenance_id"
@@ -57,13 +92,31 @@ ActiveRecord::Schema.define(version: 20140625063942) do
   end
 
   create_table "items", force: true do |t|
-    t.integer  "customer_id"
-    t.integer  "item_type_id"
-    t.string   "code"
+    t.string   "sku"
     t.text     "description"
-    t.datetime "manufactured_at"
-    t.datetime "warranty_expiry_date"
-    t.boolean  "is_deleted",           default: false
+    t.integer  "ready",       default: 0
+    t.boolean  "is_deleted",  default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "machines", force: true do |t|
+    t.string   "name"
+    t.string   "brand"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "maintenance_details", force: true do |t|
+    t.integer  "maintenance_id"
+    t.integer  "component_id"
+    t.text     "diagnosis"
+    t.integer  "diagnosis_case"
+    t.text     "solution"
+    t.integer  "solution_case"
+    t.boolean  "is_replacement_required", default: false
+    t.integer  "replacement_item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -78,23 +131,14 @@ ActiveRecord::Schema.define(version: 20140625063942) do
   end
 
   create_table "maintenances", force: true do |t|
-    t.integer  "item_id"
-    t.integer  "customer_id"
-    t.integer  "user_id"
+    t.integer  "asset_id"
     t.string   "code"
     t.datetime "complaint_date"
     t.text     "complaint"
     t.integer  "complaint_case"
-    t.text     "diagnosis"
-    t.integer  "diagnosis_case"
-    t.datetime "diagnosis_date"
-    t.boolean  "is_diagnosed",   default: false
-    t.text     "solution"
-    t.integer  "solution_case"
-    t.datetime "solution_date"
-    t.boolean  "is_solved",      default: false
-    t.boolean  "is_confirmed",   default: false
-    t.boolean  "is_deleted",     default: false
+    t.boolean  "is_confirmed",      default: false
+    t.datetime "confirmation_date"
+    t.boolean  "is_deleted",        default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -104,6 +148,24 @@ ActiveRecord::Schema.define(version: 20140625063942) do
     t.string   "title",       null: false
     t.text     "description", null: false
     t.json     "the_role",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "stock_adjustment_details", force: true do |t|
+    t.integer  "stock_adjustment_id"
+    t.integer  "item_id"
+    t.integer  "quantity"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "stock_adjustments", force: true do |t|
+    t.datetime "adjustment_date"
+    t.text     "description"
+    t.boolean  "is_deleted",      default: false
+    t.boolean  "is_confirmed",    default: false
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -140,5 +202,25 @@ ActiveRecord::Schema.define(version: 20140625063942) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "warehouse_items", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "warehouse_mutation_details", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "warehouse_mutations", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "warehouses", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

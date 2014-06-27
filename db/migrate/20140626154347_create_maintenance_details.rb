@@ -5,10 +5,15 @@ class CreateMaintenanceDetails < ActiveRecord::Migration
       t.integer :maintenance_id 
       t.integer :component_id 
       
+      
+      t.text :diagnosis
+      t.integer :diagnosis_case 
+      
       t.text :solution 
       t.integer :solution_case  
       
-      t.integer :current_item_id 
+      
+      t.boolean :is_replacement_required, :default => false 
       t.integer :replacement_item_id  # if it happens to be replacement with another item. 
 
       t.timestamps

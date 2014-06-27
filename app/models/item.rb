@@ -1,18 +1,4 @@
-=begin
-  A company has many items. 
-  
-  Those items can be under our maintenance. 
-  However, not all items are under contract maintenance. 
-  
-  Item has_many Items 
-  
-  Item has_many MaintenanceContracts 
-  
-  MaintenanceContract has_many Items through ContractedItem 
 
-  
-  
-=end
 class Item < ActiveRecord::Base
   validates_uniqueness_of :sku
   
@@ -24,7 +10,9 @@ class Item < ActiveRecord::Base
   
   def self.create_object( params ) 
     new_object           = self.new
-    new_object.sku            = params[:sku] 
+    
+    new_object.sku    =  ( params[:sku].present? ? params[:sku   ].to_s.upcase : nil )  
+    
     new_object.description            = params[:description]
      
     new_object.save
@@ -37,7 +25,7 @@ class Item < ActiveRecord::Base
   
   def update_object(params)
     
-    self.sku  = params[:sku]
+    self.sku  =  ( params[:sku].present? ? params[:sku   ].to_s.upcase : nil )  
     self.description      = params[:description    ]
     self.save
     
@@ -45,9 +33,7 @@ class Item < ActiveRecord::Base
   end
   
   def delete_object
-    
-    # check if there is stock mutations. if yes, return false , don't delete
-    
+     
     self.is_deleted  = true 
     self.save  
     

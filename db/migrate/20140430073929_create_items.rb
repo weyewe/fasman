@@ -4,7 +4,7 @@ class CreateItems < ActiveRecord::Migration
      
       t.string :sku 
       t.text :description
-      t.integer :quantity_ready , :default =>  0 
+      t.integer :ready , :default =>  0 
       
       t.boolean :is_deleted , :default => false 
 
