@@ -145,6 +145,8 @@ class PurchaseOrderDetail < ActiveRecord::Base
       return false 
     end
     
+    # if the resulting unconfirm == negative, can't be 
+    
     return true 
   end
   
