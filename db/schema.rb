@@ -213,11 +213,26 @@ ActiveRecord::Schema.define(version: 20140627125043) do
   end
 
   create_table "sales_order_details", force: true do |t|
+    t.integer  "sales_order_id"
+    t.integer  "item_id"
+    t.decimal  "discount",         precision: 5, scale: 2, default: 0.0
+    t.decimal  "unit_price",       precision: 9, scale: 2, default: 0.0
+    t.integer  "quantity",                                 default: 0
+    t.integer  "pending_delivery",                         default: 0
+    t.boolean  "is_confirmed",                             default: false
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "sales_orders", force: true do |t|
+    t.integer  "contact_id"
+    t.datetime "sales_date"
+    t.text     "description"
+    t.decimal  "total",        precision: 12, scale: 2, default: 0.0
+    t.boolean  "is_confirmed",                          default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",                            default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

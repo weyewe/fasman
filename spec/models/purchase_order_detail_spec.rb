@@ -11,6 +11,12 @@ describe PurchaseOrderDetail do
     :standard_price => standard_price
     )
     
+    @item2 = Item.create_object(
+    :sku            => sku + "32424",
+    :description    => description, 
+    :standard_price => standard_price
+    )
+    
     @contact = Contact.create_object(
       :name             => "Contact"           ,
       :description      => "Description"      ,
@@ -94,6 +100,48 @@ describe PurchaseOrderDetail do
       )
       
       @po_detail_2.errors.size.should_not ==0  
+    end
+    
+    context "created 2 po detail. update should still maintain uniqueness" do
+      before(:each) do
+        @po_detail_2 = PurchaseOrderDetail.create_object(
+          :purchase_order_id  => @po.id       ,
+          :item_id            => @item2.id     ,
+          :quantity           => @quantity   +3  ,
+          :discount           => 0  ,
+          :unit_price         => @unit_price
+        )
+      end
+      
+      it "should create po_detail_2" do
+        @po_detail_2.errors.size.should == 0 
+        @po_detail_2.should be_valid 
+      end
+      
+      it "should preserve uniqueness on update" do
+        @po_detail_2.update_object(
+          :item_id => @item.id , 
+          :quantity => @quantity, 
+          :unit_price => BigDecimal("15000"),
+          :discount => BigDecimal("5")
+        )
+        
+        @po_detail_2.errors.size.should_not ==0 
+        
+        @po_detail_2.errors.messages.each {|x| puts "error: #{x}"}
+      end
+      
+      it "should  allow self update" do
+        @po_detail_2.update_object(
+          :item_id => @item2.id , 
+          :quantity => @quantity, 
+          :unit_price => BigDecimal("150000"),
+          :discount => BigDecimal("5")
+        )
+        
+        @po_detail_2.errors.size.should ==0 
+        
+      end
     end
     
     

@@ -3,11 +3,9 @@ class PurchaseOrderDetail < ActiveRecord::Base
   belongs_to :item 
   has_many :purchase_receival_details
   
-  validates_presence_of :quantity, :unit_price,:item_id,  :discount 
+  validates_presence_of :quantity,  :item_id 
   
   validate :non_zero_quantity
-  validate :non_negative_unit_price
-  validate :discount_within_limit
   validate :unique_ordered_item 
   
   def non_zero_quantity
@@ -19,46 +17,46 @@ class PurchaseOrderDetail < ActiveRecord::Base
     end
   end
   
-  def non_negative_unit_price
-    return if not unit_price.present? 
-    
-    if unit_price < BigDecimal("0")
-      self.errors.add(:unit_price, "Harga tidak boleh negative")
-      return self 
-    end
-  end
-  
-  def discount_within_limit
-    return if not discount.present?
-    lower_limit = BigDecimal("0")
-    upper_limit = BigDecimal("100")
-    
-    if not ( discount >= lower_limit and discount <= upper_limit )
-      self.errors.add(:discount, "Harus di antara 0 dan 100")
-      return self 
-    end
-  end
+  # def non_negative_unit_price
+  #   return if not unit_price.present? 
+  #   
+  #   if unit_price < BigDecimal("0")
+  #     self.errors.add(:unit_price, "Harga tidak boleh negative")
+  #     return self 
+  #   end
+  # end
+  # 
+  # def discount_within_limit
+  #   return if not discount.present?
+  #   lower_limit = BigDecimal("0")
+  #   upper_limit = BigDecimal("100")
+  #   
+  #   if not ( discount >= lower_limit and discount <= upper_limit )
+  #     self.errors.add(:discount, "Harus di antara 0 dan 100")
+  #     return self 
+  #   end
+  # end
   
   def unique_ordered_item
     return if not item_id.present? 
     
-    ordered_item_count  = PurchaseOrderDetail.where(
+    ordered_detail_count  = PurchaseOrderDetail.where(
       :item_id => item_id,
       :purchase_order_id => purchase_order_id
     ).count 
     
-    ordered_item = PurchaseOrderDetail.where(
+    ordered_detail = PurchaseOrderDetail.where(
       :item_id => item_id,
       :purchase_order_id => purchase_order_id
     ).first
     
-    if self.persisted? and ordered_item.id != self.id   and ordered_item_count == 1
+    if self.persisted? and ordered_detail.id != self.id   and ordered_detail_count == 1
       self.errors.add(:item_id, "Item harus uniq dalam 1 pemesanan")
       return self 
     end
     
     # there is item with such item_id in the database
-    if not self.persisted? and ordered_item_count != 0 
+    if not self.persisted? and ordered_detail_count != 0 
       self.errors.add(:item_id, "Item harus uniq dalam 1 pemesanan")
       return self
     end
@@ -161,5 +159,10 @@ class PurchaseOrderDetail < ActiveRecord::Base
     item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy 
     
+  end
+  
+  def execute_receival(pr_detail_quantity)
+    self.pending_receival -= pr_detail_quantity 
+    self.save
   end
 end

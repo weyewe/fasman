@@ -1,13 +1,13 @@
-class PurchaseReceival < ActiveRecord::Base
-  belongs_to :purchase_order
-  has_many :purchase_receival_details 
+class DeliveryOrder < ActiveRecord::Base
+  belongs_to :delivery_order
+  has_many :delivery_order_details 
   
-  validates_presence_of :receival_date, :purchase_order_id 
+  validates_presence_of :delivery_date, :delivery_order_id 
   
   def self.create_object( params ) 
     new_object = self.new
-    new_object.receival_date = params[:receival_date]
-    new_object.purchase_order_id = params[:purchase_order_id]
+    new_object.delivery_date = params[:delivery_date]
+    new_object.delivery_order_id = params[:delivery_order_id]
     new_object.description = params[:description]
  
     new_object.save 
@@ -21,16 +21,16 @@ class PurchaseReceival < ActiveRecord::Base
       return self 
     end
     
-    self.receival_date = params[:receival_date]
-    self.purchase_order_id = params[:purchase_order_id]
+    self.delivery_date = params[:delivery_date]
+    self.delivery_order_id = params[:delivery_order_id]
     self.description = params[:description]
     self.save 
     
     return self
   end
   
-  def all_purchase_receival_details_deletable?
-    self.purchase_order_details.each do |x|
+  def all_delivery_order_details_deletable?
+    self.delivery_order_details.each do |x|
       return x.deletable? if not x.deletable?
     end
     
@@ -43,13 +43,13 @@ class PurchaseReceival < ActiveRecord::Base
       self.errors.add(:generic_errors, "sudah di konfirmasi")
       return self
     else
-      self.purchase_receival_details.each {|x| x.delete_object}
+      self.delivery_order_details.each {|x| x.delete_object}
       self.destroy 
     end
   end
   
-  def all_purchase_receival_details_confirmable?
-    self.purchase_receival_details.each do |x|
+  def all_delivery_order_details_confirmable?
+    self.delivery_order_details.each do |x|
       return x.confirmable? if not x.confirmable?
     end
     
@@ -62,7 +62,7 @@ class PurchaseReceival < ActiveRecord::Base
     return if self.is_deleted? 
 
     
-    if self.purchase_receival_details.count == 0 
+    if self.delivery_order_details.count == 0 
       self.errors.add(:generic_errors, "Belum ada detail")
       return self
     end
@@ -72,7 +72,7 @@ class PurchaseReceival < ActiveRecord::Base
       return self 
     end
     
-    if self.all_purchase_receival_details_confirmable?
+    if self.all_delivery_order_details_confirmable?
       if not params[:confirmed_at].present?
         self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
         return self
@@ -81,15 +81,15 @@ class PurchaseReceival < ActiveRecord::Base
       self.is_confirmed = true 
       self.confirmed_at = params[:confirmed_at]
       self.save 
-      self.purchase_receival_details.each {|x| x.confirm_object( params[:confirmed_at]) }
+      self.delivery_order_details.each {|x| x.confirm_object( params[:confirmed_at]) }
     else
       self.errors.add(:generic_errors, "Ada purchase receival detail yang tidak bisa di konfirmasi")
       return self 
     end
   end
   
-  def all_purchase_receival_details_unconfirmable?
-    self.purchase_receival_details.each do |x|
+  def all_delivery_order_details_unconfirmable?
+    self.delivery_order_details.each do |x|
       return  x.unconfirmable? if not x.unconfirmable?
     end
     
@@ -105,12 +105,12 @@ class PurchaseReceival < ActiveRecord::Base
       return self 
     end
     
-    if self.all_purchase_receival_details_unconfirmable?
+    if self.all_delivery_order_details_unconfirmable?
       
       self.is_confirmed = false 
       self.confirmed_at = nil 
       self.save 
-      self.purchase_receival_details.each {|x| x.unconfirm_object }
+      self.delivery_order_details.each {|x| x.unconfirm_object }
     else
       self.errors.add(:generic_errors, "Ada purchase receival detail yang tidak bisa di batalkan ")
       return self 

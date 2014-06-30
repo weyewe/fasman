@@ -1,23 +1,23 @@
-class PurchaseReceivalDetail < ActiveRecord::Base
-  belongs_to :purchase_order_detail
-  belongs_to :purchase_receival
+class DeliveryOrderDetail < ActiveRecord::Base
+  belongs_to :sales_order_detail
+  belongs_to :delivery_order
   
-  validates_presence_of :purchase_order_detail_id, :quantity, :purchase_receival_id 
+  validates_presence_of :sales_order_detail_id, :quantity, :delivery_order_id 
   
   validate :quantity_does_not_exceed_ordered_quantity 
   validate :quantity_non_negative
-  validate :unique_purchase_order_detail
-  validate :purchase_order_detail_come_from_the_same_purchase_order
+  validate :unique_sales_order_detail
+  validate :sales_order_detail_come_from_the_same_sales_order
   
   
   
   def quantity_does_not_exceed_ordered_quantity
     return if not quantity.present?
-    return if not purchase_order_detail_id.present? 
+    return if not sales_order_detail_id.present? 
     
-    pending_receival_quantity = purchase_order_detail.pending_receival
-    if quantity > pending_receival_quantity
-      self.errors.add(:quantity, "Tidak boleh lebih dari #{pending_receival_quantity}")
+    pending_delivery_quantity = sales_order_detail.pending_delivery
+    if quantity > pending_delivery_quantity
+      self.errors.add(:quantity, "Tidak boleh lebih dari #{pending_delivery_quantity}")
       return self
     end
   end
@@ -32,51 +32,51 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   end
   
   
-  def unique_purchase_order_detail
-    return if not purchase_order_detail_id.present? 
-    return if not purchase_receival_id.present? 
+  def unique_sales_order_detail
+    return if not sales_order_detail_id.present? 
+    return if not delivery_order_id.present? 
     
-    receival_detail_count  = PurchaseReceivalDetail.where(
-      :purchase_order_detail_id => purchase_order_detail_id,
-      :purchase_receival_id => purchase_receival_id
+    delivery_detail_count  = DeliveryOrderDetail.where(
+      :sales_order_detail_id => sales_order_detail_id,
+      :delivery_order_id => delivery_order_id
     ).count 
     
-    receival_detail = PurchaseReceivalDetail.where(
-      :purchase_order_detail_id => purchase_order_detail_id,
-      :purchase_receival_id => purchase_receival_id
+    delivery_detail = DeliveryOrderDetail.where(
+      :sales_order_detail_id => sales_order_detail_id,
+      :delivery_order_id => delivery_order_id
     ).first
     
-    if self.persisted? and receival_detail.id != self.id   and receival_detail_count == 1
-      self.errors.add(:purchase_order_detail_id, "Item harus uniq dalam 1 pemesanan")
+    if self.persisted? and delivery_detail.id != self.id   and delivery_detail_count == 1
+      self.errors.add(:sales_order_detail_id, "Item harus uniq dalam 1 pemesanan")
       return self 
     end
     
     # there is item with such item_id in the database
-    if not self.persisted? and receival_detail_count != 0 
-      self.errors.add(:purchase_order_detail_id, "Item harus uniq dalam 1 pemesanan")
+    if not self.persisted? and delivery_detail_count != 0 
+      self.errors.add(:sales_order_detail_id, "Item harus uniq dalam 1 pemesanan")
       return self
     end
   end
   
   
-  def purchase_order_detail_come_from_the_same_purchase_order
-    return if not purchase_order_detail_id.present?
+  def sales_order_detail_come_from_the_same_sales_order
+    return if not sales_order_detail_id.present?
     
-    parent_purchase_order_id = self.purchase_receival.purchase_order_id
+    parent_sales_order_id = self.delivery_order.sales_order_id
     
-    if parent_purchase_order_id != self.purchase_order_detail.purchase_order_id
-      self.errors.add(:purchase_order_detail_id, "Harus berasal dari purchase order yang sama dengan penerimaan")
+    if parent_sales_order_id != self.sales_order_detail.sales_order_id
+      self.errors.add(:sales_order_detail_id, "Harus berasal dari purchase order yang sama dengan penerimaan")
       return self 
     end
   end
   
   def self.create_object( params ) 
     new_object = self.new
-    new_object.purchase_receival_id = params[:purchase_receival_id ]
-    new_object.purchase_order_detail_id = params[:purchase_order_detail_id]
+    new_object.delivery_order_id = params[:delivery_order_id ]
+    new_object.sales_order_detail_id = params[:sales_order_detail_id]
     new_object.quantity = params[:quantity]
     
-    new_object.save 
+    new_object.save  
     
     return new_object
   end
@@ -89,9 +89,8 @@ class PurchaseReceivalDetail < ActiveRecord::Base
       return self 
     end
      
-    self.purchase_order_detail_id = params[:purchase_order_detail_id]
+    self.sales_order_detail_id = params[:sales_order_detail_id]
     self.quantity = params[:quantity]
-    
     
     self.save 
   end
@@ -111,7 +110,7 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   
   
   def confirmable? 
-    if purchase_order_detail.pending_receival - quantity < 0 
+    if sales_order_detail.pending_delivery - quantity < 0 
       return false 
     end
       
@@ -120,12 +119,12 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   
   
   def post_confirm_update_stock_mutation
-    item = self.purchase_order_detail.item  
+    item = self.sales_order_detail.item  
     
     stock_mutation = StockMutation.create_object( 
       item, # the item 
       self, # source_document_detail 
-      STOCK_MUTATION_CASE[:addition] , # stock_mutation_case,
+      STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
       STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
      ) 
     item.update_stock_mutation( stock_mutation )
@@ -134,14 +133,14 @@ class PurchaseReceivalDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:pending_receival]   # stock_mutation_item_case
+      STOCK_MUTATION_ITEM_CASE[:pending_delivery]   # stock_mutation_item_case
      )
     item.update_stock_mutation( stock_mutation )
   end
   
   
   def post_confirm_update_price_mutation
-    item = self.purchase_order_detail.item  
+    item = self.sales_order_detail.item  
     
     stock_mutation = StockMutation.create_object( 
       item, # the item 
@@ -155,7 +154,7 @@ class PurchaseReceivalDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:pending_receival]   # stock_mutation_item_case
+      STOCK_MUTATION_ITEM_CASE[:pending_delivery]   # stock_mutation_item_case
      )
     item.update_stock_mutation( stock_mutation )
   end
@@ -171,14 +170,14 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     self.post_confirm_update_stock_mutation
     # self.post_confirm_update_price_mutation 
     
-    # po_detail =self.purchase_order_detail
-    # po_detail.pending_receival -= self.quantity 
-    po_detail = self.purchase_order_detail 
-    po_detail.execute_receival( self.quantity ) 
+    # po_detail =self.sales_order_detail
+    # po_detail.pending_delivery -= self.quantity 
+    so_detail = self.sales_order_detail 
+    so_detail.execute_delivery( self.quantity ) 
   end
   
   def unconfirmable?
-    if pending_receival != quantity
+    if pending_delivery != quantity
       self.errors.add(:generic_errors, "Sudah ada penerimaan barang")
       return false 
     end
@@ -199,12 +198,12 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     
     item.reload 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_receival] ) 
+    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_delivery] ) 
     item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy
     
-    po_detail = self.purchase_order_detail
-    po_detail.execute_receival( -1* self.quantity ) 
+    po_detail = self.sales_order_detail
+    po_detail.execute_delivery( -1* self.quantity ) 
     
   end
 end
