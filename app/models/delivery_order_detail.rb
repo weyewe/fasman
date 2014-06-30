@@ -61,6 +61,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
   
   def sales_order_detail_come_from_the_same_sales_order
     return if not sales_order_detail_id.present?
+    return if not delivery_order_id.present? 
     
     parent_sales_order_id = self.delivery_order.sales_order_id
     

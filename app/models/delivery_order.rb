@@ -1,13 +1,13 @@
 class DeliveryOrder < ActiveRecord::Base
-  belongs_to :delivery_order
+  belongs_to :sales_order
   has_many :delivery_order_details 
   
-  validates_presence_of :delivery_date, :delivery_order_id 
+  validates_presence_of :delivery_date, :sales_order_id 
   
   def self.create_object( params ) 
     new_object = self.new
     new_object.delivery_date = params[:delivery_date]
-    new_object.delivery_order_id = params[:delivery_order_id]
+    new_object.sales_order_id = params[:sales_order_id]
     new_object.description = params[:description]
  
     new_object.save 
@@ -22,7 +22,7 @@ class DeliveryOrder < ActiveRecord::Base
     end
     
     self.delivery_date = params[:delivery_date]
-    self.delivery_order_id = params[:delivery_order_id]
+    self.sales_order_id = params[:sales_order_id]
     self.description = params[:description]
     self.save 
     
