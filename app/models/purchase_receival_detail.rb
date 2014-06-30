@@ -178,14 +178,16 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   end
   
   def unconfirmable?
-    if pending_receival != quantity
-      self.errors.add(:generic_errors, "Sudah ada penerimaan barang")
+    
+    if purchase_order_detail.item.ready - quantity < 0 
+      self.errors.add(:generic_errors, "Akan mengakibatkan ready item menjadi 0")
       return false 
     end
     
     return true 
   end
   
+   
   def unconfirm_object
     return self if not self.unconfirmable?
     
@@ -193,7 +195,8 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     self.confirmed_at = nil 
     self.save 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ) 
+    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] )
+    item = purchase_order_detail.item  
     item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy 
     

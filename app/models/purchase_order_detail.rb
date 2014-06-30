@@ -140,7 +140,7 @@ class PurchaseOrderDetail < ActiveRecord::Base
   end
   
   def unconfirmable?
-    if pending_receival != quantity
+    if item.pending_receival - quantity < 0 
       self.errors.add(:generic_errors, "Sudah ada penerimaan barang")
       return false 
     end
