@@ -146,7 +146,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
     stock_mutation = StockMutation.create_object( 
       item, # the item 
       self, # source_document_detail 
-      STOCK_MUTATION_CASE[:addition] , # stock_mutation_case,
+      STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
       STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
      ) 
     item.update_stock_mutation( stock_mutation )
@@ -178,10 +178,10 @@ class DeliveryOrderDetail < ActiveRecord::Base
   end
   
   def unconfirmable?
-    if pending_delivery != quantity
-      self.errors.add(:generic_errors, "Sudah ada penerimaan barang")
-      return false 
-    end
+    # if pending_delivery != quantity
+    #   self.errors.add(:generic_errors, "Sudah ada penerimaan barang")
+    #   return false 
+    # end
     
     return true 
   end
@@ -193,6 +193,8 @@ class DeliveryOrderDetail < ActiveRecord::Base
     self.confirmed_at = nil 
     self.save 
     
+    item = sales_order_detail.item 
+    
     stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ) 
     item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy 
@@ -203,8 +205,8 @@ class DeliveryOrderDetail < ActiveRecord::Base
     item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy
     
-    po_detail = self.sales_order_detail
-    po_detail.execute_delivery( -1* self.quantity ) 
+    so_detail = self.sales_order_detail
+    so_detail.execute_delivery( -1* self.quantity ) 
     
   end
 end

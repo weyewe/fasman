@@ -104,6 +104,57 @@ describe PurchaseReceivalDetail do
        ready_stock_mutation.case.should == STOCK_MUTATION_CASE[:addition]
     end
     
+    context "creating negative stock adjustment, so that pr can't be unconfirmed " do
+      before(:each) do
+        @po_detail.reload
+        @po.reload
+        @item.reload
+        @pr.reload
+        @initial_ready_item = @item.ready 
+
+        @stock_adjustment = StockAdjustment.create_object(
+          :adjustment_date  => DateTime.now , 
+          :description      => "awesome adjustment "
+        )
+        
+        @soe = StockAdjustmentDetail.create_object(
+          :stock_adjustment_id => @stock_adjustment.id , 
+          :quantity => -1* @quantity, 
+          :item_id => @item.id 
+        )
+        
+        @stock_adjustment.confirm_object(:confirmed_at => DateTime.now)
+        @po_detail.reload
+        @po.reload
+        @item.reload
+        @pr.reload
+        
+        @pr_detail.reload 
+      end
+      
+      it "should confirm stock adjustment" do
+        @stock_adjustment.is_confirmed.should be_true 
+      end
+      
+      it "should reduce ready item" do
+        @final_ready_item = @item.ready 
+        diff = @final_ready_item - @initial_ready_item
+        diff.should == -1 * @quantity 
+      end
+      
+      it "should not be unconfirmable" do
+        @pr_detail.unconfirmable?.should be_false
+      end
+      
+      it "should not allow confirm" do
+        @pr.unconfirm_object
+        @pr.errors.size.should_not == 0 
+      end
+      
+      
+    end
+    
+    
     context "unconfirm purchase receival" do
       before(:each) do
         @item.reload 
@@ -142,6 +193,8 @@ describe PurchaseReceivalDetail do
          ).count.should ==0 
       end
     end
+  
+  
   end
   
 
