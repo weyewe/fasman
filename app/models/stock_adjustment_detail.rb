@@ -21,7 +21,7 @@ class StockAdjustmentDetail < ActiveRecord::Base
   end
   
   def warehouse_item
-    return if not stock_adjustment.present? 
+    return if not stock_adjustment_id.present? 
     return if not item_id.present? 
     
     selected_warehouse_item = WarehouseItem.where(
@@ -65,8 +65,11 @@ class StockAdjustmentDetail < ActiveRecord::Base
   end
   
   def non_negative_final_quantity_in_warehouse
+    return if not stock_adjustment_id.present? 
+    return if not item_id.present?
+    
     if quantity < 0 
-      if warehose_item.ready  + quantity < 0 
+      if warehouse_item.ready  + quantity < 0 
         self.errors.add(:quantity, "Tidak ada cukup kuantitas di gudang")
         return self 
       end
@@ -135,7 +138,8 @@ class StockAdjustmentDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       stock_mutation_case, # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
+      STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
+      stock_adjustment.warehouse_id 
      )
      
   

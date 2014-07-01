@@ -133,8 +133,31 @@ class MaintenanceDetail < ActiveRecord::Base
     self.destroy
   end 
   
+  def warehouse_item
+    return nil if not is_replacement_required.present? 
+    return nil if  not is_replacement_required?
+    
+    selected_warehouse_item = WarehouseItem.where(
+      :item_id => self.replacement_item_id ,
+      :warehouse_id => self.maintenance.warehouse_id
+    ).first 
+    
+    if selected_warehouse_item.nil?
+      return WarehouseItem.create_object(
+        :item_id => self.replacement_item_id ,
+        :warehouse_id =>  self.maintenance.warehouse_id
+      )
+    else
+      return selected_warehouse_item
+    end
+    
+  end
+  
   def confirmable?
-     
+     if is_replacement_required.present? and is_replacement_required? and warehouse_item.ready -1 < 0 
+       self.errors.add(:generic_errors, "Tidak ada cukup item untuk replacement")
+       return self 
+     end
   end
   
   
@@ -143,10 +166,26 @@ class MaintenanceDetail < ActiveRecord::Base
   end
   
   def confirm 
+    if is_replacement_required? 
+      
+      stock_mutation = StockMutation.create_object( 
+        replacement_item, # the item 
+        self, # source_document_detail 
+        STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
+        STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
+       ) 
+      replacement_item.update_stock_mutation( stock_mutation )
+      warehouse_item.update_stock_mutation( stock_mutation )
+      
+    end
+  end
+  
+  def unconfirm
     if is_replacement_required?
-      selected_replacement_item = self.replacement_item
-      selected_replacement_item.ready -= 1 
-      selected_replacement_item.save 
+      stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] )
+      replacement_item.reverse_stock_mutation( stock_mutation )
+      warehouse_item.reverse_stock_mutation( stock_mutation )
+      stock_mutation.destroy
     end
   end
   

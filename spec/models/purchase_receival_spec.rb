@@ -5,6 +5,10 @@ describe PurchaseReceival do
     sku = "acedin3321"
     description = "awesome"
     standard_price = BigDecimal("80000")
+    @warehouse = Warehouse.create_object(
+      :name => "warehouse awesome",
+      :description => "Badaboom"
+    )
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 
@@ -56,7 +60,8 @@ describe PurchaseReceival do
     @pr = PurchaseReceival.create_object(
       :receival_date  => DateTime.new(2012,2,2,0,0,0),
       :description    => "Awesome purchase order",
-      :purchase_order_id     => @po.id 
+      :purchase_order_id     => @po.id ,
+      :warehouse_id => @warehouse.id 
     )
     
     @pr.should be_valid 
@@ -66,7 +71,8 @@ describe PurchaseReceival do
     @pr = PurchaseReceival.create_object(
       :receival_date  => nil,
       :description    => "Awesome purchase order",
-      :purchase_order_id     => @po.id 
+      :purchase_order_id     => @po.id , 
+      :warehouse_id => @warehouse.id 
     )
     
     @pr.should_not be_valid 
@@ -74,7 +80,8 @@ describe PurchaseReceival do
     @pr = PurchaseReceival.create_object(
       :receival_date  => DateTime.new(2012,2,2,0,0,0),
       :description    => "Awesome purchase order",
-      :purchase_order_id     =>  nil
+      :purchase_order_id     =>  nil , 
+      :warehouse_id => @warehouse.id
     )
     
     @pr.should_not be_valid
@@ -85,7 +92,8 @@ describe PurchaseReceival do
       @pr = PurchaseReceival.create_object(
         :receival_date  => DateTime.new(2012,2,2,0,0,0),
         :description    => "Awesome purchase receival",
-        :purchase_order_id     => @po.id
+        :purchase_order_id     => @po.id , 
+        :warehouse_id => @warehouse.id
       )
     end
     
@@ -93,7 +101,8 @@ describe PurchaseReceival do
       @pr.update_object(
         :receival_date  => DateTime.new(2012,2,2,0,0,0),
         :description    => "Awesome purchase rec",
-        :purchase_order_id     => @po.id
+        :purchase_order_id     => @po.id , 
+        :warehouse_id => @warehouse.id
       )
       
       @pr.errors.size.should == 0 

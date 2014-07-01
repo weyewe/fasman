@@ -5,6 +5,10 @@ describe DeliveryOrder do
     sku = "acedin3321"
     description = "awesome"
     standard_price = BigDecimal("80000")
+    @warehouse = Warehouse.create_object(
+      :name => "warehouse awesome",
+      :description => "Badaboom"
+    )
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 

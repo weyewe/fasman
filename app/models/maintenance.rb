@@ -1,10 +1,22 @@
 
 class Maintenance < ActiveRecord::Base
   validates_presence_of :asset_id 
-  validates_presence_of :complaint_date 
+  validates_presence_of :complaint_date , :warehouse_id
   
   belongs_to :asset 
   has_many :maintenance_details 
+  
+  validate :valid_warehouse_id 
+  
+  def valid_warehouse_id
+    return  if not warehouse_id.present? 
+    object = Warehouse.find_by_id warehouse_id
+    
+    if object.nil?
+      self.errors.add(:warehouse_id, "Harus ada dan valid")
+    end
+  end
+  
   
   
 =begin
@@ -34,6 +46,7 @@ class Maintenance < ActiveRecord::Base
     new_object.complaint_date = params[:complaint_date] 
     new_object.complaint      = params[:complaint]
     new_object.complaint_case = params[:complaint_case]
+    new_object.warehouse_id = params[:warehouse_id]
 
      
     if new_object.save
@@ -59,6 +72,7 @@ class Maintenance < ActiveRecord::Base
     self.complaint_date = params[:complaint_date] 
     self.complaint      = params[:complaint]
     self.complaint_case = params[:complaint_case]
+    self.warehouse_id = params[:warehouse_id]
 
     self.save
     

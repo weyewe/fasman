@@ -121,8 +121,8 @@ class PurchaseOrderDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:addition] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:pending_receival]   # stock_mutation_item_case
-     
+      STOCK_MUTATION_ITEM_CASE[:pending_receival],   # stock_mutation_item_case
+     nil
      ) 
     item.update_stock_mutation( stock_mutation )
   end

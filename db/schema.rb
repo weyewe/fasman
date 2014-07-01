@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.boolean  "is_confirmed",   default: false
     t.datetime "confirmed_at"
     t.boolean  "is_deleted",     default: false
+    t.integer  "warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -173,6 +174,7 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.boolean  "is_confirmed",      default: false
     t.datetime "confirmation_date"
     t.boolean  "is_deleted",        default: false
+    t.integer  "warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -220,6 +222,7 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.boolean  "is_confirmed",      default: false
     t.datetime "confirmed_at"
     t.boolean  "is_deleted",        default: false
+    t.integer  "warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -262,6 +265,8 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.integer  "stock_adjustment_id"
     t.integer  "item_id"
     t.integer  "quantity"
+    t.boolean  "is_confirmed",        default: false
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -272,6 +277,7 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.boolean  "is_deleted",      default: false
     t.boolean  "is_confirmed",    default: false
     t.datetime "confirmed_at"
+    t.integer  "warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -284,6 +290,7 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.string   "source_document_detail"
     t.integer  "item_case"
     t.datetime "mutation_date"
+    t.integer  "warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -322,6 +329,9 @@ ActiveRecord::Schema.define(version: 20140630120758) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "warehouse_items", force: true do |t|
+    t.integer  "warehouse_id"
+    t.integer  "item_id"
+    t.integer  "ready",        default: 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -337,6 +347,8 @@ ActiveRecord::Schema.define(version: 20140630120758) do
   end
 
   create_table "warehouses", force: true do |t|
+    t.string   "name"
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
