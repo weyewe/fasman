@@ -158,6 +158,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
       STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
      ) 
     item.update_stock_mutation( stock_mutation )
+    warehouse_item.update_stock_mutation( stock_mutation )
     
     stock_mutation = StockMutation.create_object( 
       item, # the item 
@@ -166,7 +167,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
       STOCK_MUTATION_ITEM_CASE[:pending_delivery]   # stock_mutation_item_case
      )
     item.update_stock_mutation( stock_mutation )
-    warehouse_item.update_stock_mutation( stock_mutation )
+    
     
   end
   
@@ -228,18 +229,20 @@ class DeliveryOrderDetail < ActiveRecord::Base
     
     stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ) 
     item.reverse_stock_mutation( stock_mutation )
+    warehouse_item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy 
     
     item.reload 
     
     stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_delivery] ) 
     item.reverse_stock_mutation( stock_mutation )
+    
     stock_mutation.destroy
     
     so_detail = self.sales_order_detail
     so_detail.execute_delivery( -1* self.quantity ) 
     
-    warehouse_item.revert_stock_mutation( stock_mutation )
+    
     
   end
 end

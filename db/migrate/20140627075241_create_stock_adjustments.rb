@@ -9,6 +9,8 @@ class CreateStockAdjustments < ActiveRecord::Migration
       t.boolean :is_confirmed, :default => false 
       t.datetime :confirmed_at
       
+      t.integer :warehouse_id 
+      
     
       t.timestamps
     end

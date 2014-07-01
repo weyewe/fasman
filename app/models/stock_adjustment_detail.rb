@@ -6,6 +6,40 @@ class StockAdjustmentDetail < ActiveRecord::Base
   
   validate :non_zero_quantity
   validate :non_negative_final_quantity
+  validate :non_negative_final_quantity_in_warehouse 
+  
+  validate :valid_item_id
+  
+  def valid_item_id
+    return  if not item_id.present? 
+    object = Item.find_by_id item_id
+    
+    if object.nil?
+      self.errors.add(:item_id, "Harus ada dan valid")
+      return self 
+    end
+  end
+  
+  def warehouse_item
+    return if not stock_adjustment.present? 
+    return if not item_id.present? 
+    
+    selected_warehouse_item = WarehouseItem.where(
+      :item_id => item_id,
+      :warehouse_id => self.stock_adjustment.warehouse_id
+    ).first 
+    
+    if selected_warehouse_item.nil?
+      return WarehouseItem.create_object(
+        :item_id => item_id,
+        :warehouse_id =>  self.stock_adjustment.warehouse_id
+      )
+    else
+      return selected_warehouse_item
+    end
+    
+  end
+  
   
   def non_zero_quantity
     return if not quantity.present? 
@@ -28,6 +62,16 @@ class StockAdjustmentDetail < ActiveRecord::Base
       return self 
     end
      
+  end
+  
+  def non_negative_final_quantity_in_warehouse
+    if quantity < 0 
+      if warehose_item.ready  + quantity < 0 
+        self.errors.add(:quantity, "Tidak ada cukup kuantitas di gudang")
+        return self 
+      end
+    end
+    
   end
    
   
@@ -72,6 +116,7 @@ class StockAdjustmentDetail < ActiveRecord::Base
     return false if self.stock_adjustment.is_confirmed?
     
     self.non_negative_final_quantity
+    self.non_negative_final_quantity_in_warehouse
     return false if self.errors.size != 0  
     
     
@@ -83,8 +128,20 @@ class StockAdjustmentDetail < ActiveRecord::Base
   def confirm_object(confirmation_datetime)
     return self if not self.confirmable?
     
-    item.ready += self.quantity
-    item.save 
+    stock_mutation_case  = STOCK_MUTATION_CASE[:addition]
+    stock_mutation_case  = STOCK_MUTATION_CASE[:deduction] if quantity < 0 
+    
+    stock_mutation = StockMutation.create_object( 
+      item, # the item 
+      self, # source_document_detail 
+      stock_mutation_case, # stock_mutation_case,
+      STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
+     )
+     
+  
+    item.update_stock_mutation( stock_mutation ) 
+    warehouse_item.update_stock_mutation(stock_mutation) 
+    
      
   end
   
@@ -103,8 +160,16 @@ class StockAdjustmentDetail < ActiveRecord::Base
   def unconfirm_object
     return self if not self.unconfirmable?
     
-    item.ready += -1* self.quantity 
-    item.save 
+    self.is_confirmed = false 
+    self.confirmed_at = nil 
+    self.save
+    
+    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] )
+    
+    item.reverse_stock_mutation( stock_mutation )
+    warehouse_item.reverse_stock_mutation( stock_mutation )
+    stock_mutation.destroy
+    
   end
   
    

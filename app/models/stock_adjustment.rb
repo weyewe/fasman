@@ -2,10 +2,26 @@ class StockAdjustment < ActiveRecord::Base
   has_many :stock_adjustment_details 
   validates_presence_of :adjustment_date 
   
+  validates_presence_of :warehouse_id
+  
+  validate :valid_warehouse_id
+  
+  def valid_warehouse_id
+    return  if not warehouse_id.present? 
+    object = Warehouse.find_by_id warehouse_id
+    
+    if object.nil?
+      self.errors.add(:warehouse_id, "Harus ada dan valid")
+    end
+  end
+  
+  
+  
   def self.create_object( params ) 
     new_object = self.new
     new_object.adjustment_date = params[:adjustment_date]
     new_object.description = params[:description]
+    new_object.warehouse_id = params[:warehouse_id]
     new_object.save 
     
     return new_object 
@@ -14,6 +30,7 @@ class StockAdjustment < ActiveRecord::Base
   def update_object(params )
     self.adjustment_date = params[:adjustment_date]
     self.description = params[:description]
+    self.warehouse_id = params[:warehouse_id]
     self.save 
     
     return self
