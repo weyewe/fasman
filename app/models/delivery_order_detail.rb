@@ -8,6 +8,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
   validate :quantity_non_negative
   validate :unique_sales_order_detail
   validate :sales_order_detail_come_from_the_same_sales_order
+  validate :enough_ready_item_in_warehouse
   
   
   
@@ -67,6 +68,34 @@ class DeliveryOrderDetail < ActiveRecord::Base
     
     if parent_sales_order_id != self.sales_order_detail.sales_order_id
       self.errors.add(:sales_order_detail_id, "Harus berasal dari purchase order yang sama dengan penerimaan")
+      return self 
+    end
+  end
+  
+  def warehouse_item
+    selected_warehouse_item = WarehouseItem.where(
+      :item_id => self.sales_order_detail.item_id,
+      :warehouse_id => self.delivery_order.warehouse_id
+    ).first 
+    
+    if selected_warehouse_item.nil?
+      return WarehouseItem.create_object(
+        :item_id => self.purchase_order_detail.item_id,
+        :warehouse_id =>  self.purchase_receival.warehouse_id
+      )
+    else
+      return selected_warehouse_item
+    end
+    
+  end
+  
+  
+  def enough_ready_item_in_warehouse
+    return if not sales_order_detail_id.present?
+    return if not warehouse_id.present? 
+    
+    if warehouse_item.ready  < self.quantity
+      self.errors.add(:quantity, "Not enough item in  warehouse #{warehouse.name}")
       return self 
     end
   end
@@ -137,6 +166,8 @@ class DeliveryOrderDetail < ActiveRecord::Base
       STOCK_MUTATION_ITEM_CASE[:pending_delivery]   # stock_mutation_item_case
      )
     item.update_stock_mutation( stock_mutation )
+    warehouse_item.update_stock_mutation( stock_mutation )
+    
   end
   
   
@@ -207,6 +238,8 @@ class DeliveryOrderDetail < ActiveRecord::Base
     
     so_detail = self.sales_order_detail
     so_detail.execute_delivery( -1* self.quantity ) 
+    
+    warehouse_item.revert_stock_mutation( stock_mutation )
     
   end
 end

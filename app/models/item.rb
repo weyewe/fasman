@@ -1,4 +1,7 @@
 class Item < ActiveRecord::Base
+  has_many :warehouses, :through => :warehouse_items
+  has_many :warehouse_items 
+  
   has_many :price_mutations 
   
   validate :uniq_sku_in_active_objects

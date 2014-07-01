@@ -2,13 +2,35 @@ class PurchaseReceival < ActiveRecord::Base
   belongs_to :purchase_order
   has_many :purchase_receival_details 
   
-  validates_presence_of :receival_date, :purchase_order_id 
+  
+  validates_presence_of :receival_date, :purchase_order_id , :warehouse_id 
+  
+  validate :valid_purchase_order_id, :valid_warehouse_id
+  
+  def valid_purchase_order_id
+    return  if not purchase_order_id.present? 
+    object = PurchaseOrder.find_by_id purchase_order_id
+    
+    if object.nil?
+      self.errors.add(:purchase_order_id, "Harus ada dan valid")
+    end
+  end
+  
+  def valid_warehouse_id
+    return  if not warehouse_id.present? 
+    object = Warehouse.find_by_id warehouse_id
+    
+    if object.nil?
+      self.errors.add(:warehouse_id, "Harus ada dan valid")
+    end
+  end
   
   def self.create_object( params ) 
     new_object = self.new
     new_object.receival_date = params[:receival_date]
     new_object.purchase_order_id = params[:purchase_order_id]
     new_object.description = params[:description]
+    new_object.warehouse_id = params[:warehouse_id ]
  
     new_object.save 
     
@@ -24,6 +46,7 @@ class PurchaseReceival < ActiveRecord::Base
     self.receival_date = params[:receival_date]
     self.purchase_order_id = params[:purchase_order_id]
     self.description = params[:description]
+    self.warehouse_id = params[:warehouse_id]
     self.save 
     
     return self

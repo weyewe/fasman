@@ -11,7 +11,10 @@ class CreateStockMutations < ActiveRecord::Migration
       
       t.datetime :mutation_date 
       
+      t.integer :warehouse_id 
+      
       t.timestamps
+      
     end
   end
 end

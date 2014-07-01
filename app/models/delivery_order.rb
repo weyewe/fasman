@@ -2,13 +2,35 @@ class DeliveryOrder < ActiveRecord::Base
   belongs_to :sales_order
   has_many :delivery_order_details 
   
-  validates_presence_of :delivery_date, :sales_order_id 
+  validates_presence_of :delivery_date, :sales_order_id, :warehouse_id  
+  validate :valid_sales_order_id 
+  validate :valid_warehouse_id
+  
+  def valid_sales_order_id
+    return  if not sales_order_id.present? 
+    object = SalesOrder.find_by_id sales_order_id
+    
+    if object.nil?
+      self.errors.add(:sales_order_id, "Harus ada dan valid")
+    end
+  end
+  
+  def valid_warehouse_id
+    return  if not warehouse_id.present? 
+    object = Warehouse.find_by_id warehouse_id
+    
+    if object.nil?
+      self.errors.add(:warehouse_id, "Harus ada dan valid")
+    end
+  end
+  
   
   def self.create_object( params ) 
     new_object = self.new
     new_object.delivery_date = params[:delivery_date]
     new_object.sales_order_id = params[:sales_order_id]
     new_object.description = params[:description]
+    new_object.warehouse_id = params[:warehouse_id]
  
     new_object.save 
     
@@ -24,6 +46,7 @@ class DeliveryOrder < ActiveRecord::Base
     self.delivery_date = params[:delivery_date]
     self.sales_order_id = params[:sales_order_id]
     self.description = params[:description]
+    self.warehouse_id = params[:warehouse_id]
     self.save 
     
     return self

@@ -10,6 +10,8 @@ class CreatePurchaseReceivals < ActiveRecord::Migration
       
       t.boolean :is_deleted , :default => false
       
+      t.integer :warehouse_id 
+      
       
       t.timestamps
     end

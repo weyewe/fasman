@@ -8,6 +8,11 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   validate :quantity_non_negative
   validate :unique_purchase_order_detail
   validate :purchase_order_detail_come_from_the_same_purchase_order
+   
+  
+  after_save :create_warehouse_item_if_not_existed_yet
+  
+  
   
   
   
@@ -70,13 +75,44 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     end
   end
   
+  def warehouse_item
+    selected_warehouse_item = WarehouseItem.where(
+      :item_id => self.purchase_order_detail.item_id,
+      :warehouse_id => self.purchase_receival.warehouse_id
+    ).first 
+    
+    if selected_warehouse_item.nil?
+      return WarehouseItem.create_object(
+        :item_id => self.purchase_order_detail.item_id,
+        :warehouse_id =>  self.purchase_receival.warehouse_id
+      )
+    else
+      return selected_warehouse_item
+    end
+    
+  end
+  
+  def create_warehouse_item_if_not_existed_yet
+    selected_warehouse_item = WarehouseItem.where(
+      :item_id => self.purchase_order_detail.item_id,
+      :warehouse_id => self.purchase_receival.warehouse_id
+    ).first 
+    
+    if selected_warehouse_item.nil?
+      WarehouseItem.create_object(
+        :item_id => self.purchase_order_detail.item_id,
+        :warehouse_id =>  self.purchase_receival.warehouse_id
+      )
+    end
+  end
+  
   def self.create_object( params ) 
     new_object = self.new
     new_object.purchase_receival_id = params[:purchase_receival_id ]
     new_object.purchase_order_detail_id = params[:purchase_order_detail_id]
     new_object.quantity = params[:quantity]
     
-    new_object.save 
+    new_object.save
     
     return new_object
   end
@@ -119,6 +155,8 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   end
   
   
+  
+  
   def post_confirm_update_stock_mutation
     item = self.purchase_order_detail.item  
     
@@ -137,28 +175,30 @@ class PurchaseReceivalDetail < ActiveRecord::Base
       STOCK_MUTATION_ITEM_CASE[:pending_receival]   # stock_mutation_item_case
      )
     item.update_stock_mutation( stock_mutation )
+    
+    warehouse_item.update_stock_mutation( stock_mutation )
   end
   
   
-  def post_confirm_update_price_mutation
-    item = self.purchase_order_detail.item  
-    
-    stock_mutation = StockMutation.create_object( 
-      item, # the item 
-      self, # source_document_detail 
-      STOCK_MUTATION_CASE[:addition] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
-     ) 
-    item.update_stock_mutation( stock_mutation )
-    
-    stock_mutation = StockMutation.create_object( 
-      item, # the item 
-      self, # source_document_detail 
-      STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:pending_receival]   # stock_mutation_item_case
-     )
-    item.update_stock_mutation( stock_mutation )
-  end
+  # def post_confirm_update_price_mutation
+  #   item = self.purchase_order_detail.item  
+  #   
+  #   stock_mutation = StockMutation.create_object( 
+  #     item, # the item 
+  #     self, # source_document_detail 
+  #     STOCK_MUTATION_CASE[:addition] , # stock_mutation_case,
+  #     STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
+  #    ) 
+  #   item.update_stock_mutation( stock_mutation )
+  #   
+  #   stock_mutation = StockMutation.create_object( 
+  #     item, # the item 
+  #     self, # source_document_detail 
+  #     STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
+  #     STOCK_MUTATION_ITEM_CASE[:pending_receival]   # stock_mutation_item_case
+  #    )
+  #   item.update_stock_mutation( stock_mutation )
+  # end
    
   
   def confirm_object(confirmation_datetime)
@@ -208,6 +248,8 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     
     po_detail = self.purchase_order_detail
     po_detail.execute_receival( -1* self.quantity ) 
+    
+    warehouse_item.revert_stock_mutation( stock_mutation )
     
   end
 end
