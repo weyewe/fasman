@@ -199,6 +199,7 @@ Ext.define('AM.controller.Compatibilities', {
 			view.show();
 			view.setParentData1(parentObject1);
 			view.setParentData2(parentObject2);
+			view.setComboBoxData( record );
 		}
 		
 		

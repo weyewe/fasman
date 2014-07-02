@@ -13,6 +13,33 @@ Ext.define('AM.view.master.compatibility.Form', {
   initComponent: function() {
 		var me = this; 
 	  
+	
+		var remoteJsonStoreItem = Ext.create(Ext.data.JsonStore, {
+			storeId : 'item_search',
+			fields	: [
+			 		{
+						name : 'item_sku',
+						mapping : "sku"
+					} ,
+					{
+						name : 'item_id',
+						mapping : "id"
+					}  
+			],
+			
+		 
+			proxy  	: {
+				type : 'ajax',
+				url : 'api/search_item',
+				reader : {
+					type : 'json',
+					root : 'records', 
+					totalProperty  : 'total'
+				}
+			},
+			autoLoad : false 
+		});
+	 
 		 
 		
 		
@@ -32,28 +59,46 @@ Ext.define('AM.view.master.compatibility.Form', {
 	        xtype: 'hidden',
 	        name : 'id',
 	        fieldLabel: 'id'
-	      },
+	      }, 
 				{
 	        xtype: 'hidden',
-	        name : 'group_id',
-	        fieldLabel: 'Group ID'
+	        name : 'component_id',
+	        fieldLabel: 'COMPONENT ID '
 	      },
 				{
 					xtype: 'displayfield',
-					fieldLabel: 'Group',
-					name: 'group_name' ,
+					fieldLabel: 'Machine',
+					name: 'machine_name' ,
+					value : '10' 
+				},
+				
+				{
+					xtype: 'displayfield',
+					fieldLabel: 'Component',
+					name: 'component_name' ,
 					value : '10' 
 				},
 				{
-					xtype: 'textfield',
-					fieldLabel: 'Name',
-					name: 'name'  
-				},
-				{
-					xtype: 'textarea',
-					name : 'description',
-					fieldLabel: 'Deskripsi'
-				},
+					fieldLabel: 'Item',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'item_sku',
+					valueField : 'item_id',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : remoteJsonStoreItem , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{item_sku}">' + 
+													'<div class="combo-name">{item_sku}</div>' + 
+							 					'</div>';
+						}
+					},
+					name : 'item_id' 
+				} 
 				
 			]
     }];
@@ -71,17 +116,36 @@ Ext.define('AM.view.master.compatibility.Form', {
  
   },
 
+	setSelectedItem: function( item_id ){
+		var comboBox = this.down('form').getForm().findField('item_id'); 
+		var me = this; 
+		var store = comboBox.store;  
+		store.load({
+			params: {
+				selected_id : item_id 
+			},
+			callback : function(records, options, success){
+				me.setLoading(false);
+				comboBox.setValue( item_id );
+			}
+		});
+	},
 
 	setComboBoxData : function( record){ 
+		console.log("gonna set combo box data");
+		var me = this; 
+		me.setLoading(true);
+		
+		me.setSelectedItem( record.get("item_id")  ) ;
 	},
 	
 	setParentData1: function( record ){
-		
+		this.down('form').getForm().findField('machine_name').setValue(record.get('name')); 
 	},
 	
 	setParentData2: function( record ){
-		this.down('form').getForm().findField('group_name').setValue(record.get('name')); 
-		this.down('form').getForm().findField('group_id').setValue(record.get('id')); 
+		this.down('form').getForm().findField('component_name').setValue(record.get('name')); 
+		this.down('form').getForm().findField('component_id').setValue(record.get('id')); 
 	},
 });
 

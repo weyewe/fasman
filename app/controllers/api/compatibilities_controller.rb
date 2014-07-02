@@ -30,17 +30,17 @@ class Api::CompatibilitiesController < Api::BaseApiController
       @total = Compatibility.active_objects.count
     end
     
-    # render :json => { :parts => @objects , :total => @total, :success => true }
+    # render :json => { :compatibilities => @objects , :total => @total, :success => true }
   end
 
   def create
-    @object = Compatibility.create_object( params[:part] )  
+    @object = Compatibility.create_object( params[:compatibility] )  
     
     
  
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :parts => [@object] , 
+                        :compatibilities => [@object] , 
                         :total => Compatibility.active_objects.count }  
     else
       msg = {
@@ -57,11 +57,11 @@ class Api::CompatibilitiesController < Api::BaseApiController
   def update
     
     @object = Compatibility.find_by_id params[:id] 
-    @object.update_object( params[:part])
+    @object.update_object( params[:compatibility])
      
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :parts => [@object],
+                        :compatibilities => [@object],
                         :total => Compatibility.active_objects.count  } 
     else
       msg = {
