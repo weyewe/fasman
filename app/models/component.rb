@@ -6,7 +6,8 @@ class Component < ActiveRecord::Base
   has_many :compatibilities 
   
   belongs_to :machine
-  
+  has_many :maintenance_details 
+  has_many :asset_details
   
  
   
@@ -33,7 +34,7 @@ class Component < ActiveRecord::Base
   
   def update_object(params)
     
-    self.sku  = params[:name]
+    self.name  = params[:name]
     self.description      = params[:description    ]
     self.machine_id      = params[:machine_id    ]
     self.save
@@ -53,7 +54,9 @@ class Component < ActiveRecord::Base
       return self 
     end
     
-    if self.asset_aprts.count != 0 
+    
+    
+    if self.asset_details.count != 0 
       self.errors.add(:generic_errors, "Sudah ada mesin yang memiliki component terdaftar ini")
       return self 
     end

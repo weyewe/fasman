@@ -1,8 +1,8 @@
-Ext.define('AM.view.master.component.Form', {
+Ext.define('AM.view.master.compatibility.Form', {
   extend: 'Ext.window.Window',
-  alias : 'widget.componentform',
+  alias : 'widget.compatibilityform',
 
-  title : 'Add / Edit Component',
+  title : 'Add / Edit Compatibility',
   layout: 'fit',
 	width	: 500,
   autoShow: true,  // does it need to be called?
@@ -12,10 +12,7 @@ Ext.define('AM.view.master.component.Form', {
 	
   initComponent: function() {
 		var me = this; 
-	 
-	 
-		
-		
+	  
 		 
 		
 		
@@ -38,13 +35,13 @@ Ext.define('AM.view.master.component.Form', {
 	      },
 				{
 	        xtype: 'hidden',
-	        name : 'machine_id',
-	        fieldLabel: 'Machine ID'
+	        name : 'group_id',
+	        fieldLabel: 'Group ID'
 	      },
 				{
 					xtype: 'displayfield',
-					fieldLabel: 'Machine',
-					name: 'machine_name' ,
+					fieldLabel: 'Group',
+					name: 'group_name' ,
 					value : '10' 
 				},
 				{
@@ -52,14 +49,11 @@ Ext.define('AM.view.master.component.Form', {
 					fieldLabel: 'Name',
 					name: 'name'  
 				},
-			  
 				{
 					xtype: 'textarea',
 					name : 'description',
 					fieldLabel: 'Deskripsi'
 				},
-				
-				 
 				
 			]
     }];
@@ -77,32 +71,17 @@ Ext.define('AM.view.master.component.Form', {
  
   },
 
-	
-	setSelectedType: function( item_type_id ){
-		// var comboBox = this.down('form').getForm().findField('item_type_id'); 
-		// var me = this; 
-		// var store = comboBox.store;  
-		// store.load({
-		// 	params: {
-		// 		selected_id : item_type_id 
-		// 	},
-		// 	callback : function(records, options, success){
-		// 		me.setLoading(false);
-		// 		comboBox.setValue( item_type_id );
-		// 	}
-		// });
-	},
 
-	setComboBoxData : function( record){
-		// var me = this; 
-		// me.setLoading(true);
-		// 
-		// me.setSelectedType( record.get("item_type_id")  ) ; 
+	setComboBoxData : function( record){ 
 	},
 	
-	setParentData: function( record ){
-		this.down('form').getForm().findField('machine_name').setValue(record.get('name')); 
-		this.down('form').getForm().findField('machine_id').setValue(record.get('id')); 
+	setParentData1: function( record ){
+		
+	},
+	
+	setParentData2: function( record ){
+		this.down('form').getForm().findField('group_name').setValue(record.get('name')); 
+		this.down('form').getForm().findField('group_id').setValue(record.get('id')); 
 	},
 });
 

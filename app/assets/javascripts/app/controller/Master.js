@@ -65,19 +65,7 @@ Ext.define("AM.controller.Master", {
 					action : 'index'
 				}
 				]
-			}, 
-			{ 
-				text:'Customer', 
-				viewClass:'AM.view.master.Customer', 
-				leaf:true, 
-				iconCls:'text',
-				conditions : [
-				{
-					controller : 'customers',
-					action : 'index'
-				}
-				]
-			},
+			}
 			
 			// { 
 			// 	text:'Item Type', 
@@ -146,6 +134,18 @@ Ext.define("AM.controller.Master", {
 				conditions : [
 				{
 					controller : 'components',
+					action : 'index'
+				}
+				]
+			},
+			{ 
+				text:'Compatibility', 
+				viewClass:'AM.view.master.Compatibility', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'compatibilities',
 					action : 'index'
 				}
 				]

@@ -121,3 +121,23 @@ data_entry_role = Role.create!(
   
   puts "Total machine: #{Machine.count}"
   
+  Machine.all.each do |x|
+    (1..3).each do |y|
+      component = Component.create_object(
+        :name => "Component Name #{x.id} - #{y}" ,
+        :description => "Description #{x.id} - #{y}",
+        :machine_id => x.id 
+      )
+    end
+    
+  end
+  puts "Total component: #{Component.count}"
+  
+  Component.all.each do |x|
+    Compatibility.create_object(
+      :item_id => Item.first.id,
+      :component_id => x.id 
+    )
+  end
+  
+  puts "Total compatibility: #{Compatibility.count}" 

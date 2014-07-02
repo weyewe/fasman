@@ -1,14 +1,16 @@
-Ext.define('AM.view.master.component.List' ,{
+Ext.define('AM.view.master.compatibility.List' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.componentlist',
+  	alias : 'widget.compatibilitylist',
 
-  	store: 'Components', 
+  	store: 'Compatibilities', 
  
 
 	initComponent: function() {
 		this.columns = [
-			{ header: 'Name',  dataIndex: 'name', flex : 1  },
-			{ header: 'Description',  dataIndex: 'description', flex : 1  }, 
+			// { header: 'Member', dataIndex: 'member_name' , flex : 1 },
+			{ header: 'ID',  dataIndex: 'id', flex : 1  },
+			{ header: 'Item',  dataIndex: 'item_sku', flex : 1  },
+			{ header: 'Component',  dataIndex: 'component_name', flex : 1  },
 			
 		];
 
@@ -30,11 +32,11 @@ Ext.define('AM.view.master.component.List' ,{
 			disabled: true
 		});
 		
-		this.deactivateObjectButton = new Ext.Button({
-			text: 'Deactivate',
-			action: 'deactivateObject',
-			disabled: true
-		});
+		// this.deactivateObjectButton = new Ext.Button({
+		// 	text: 'Deactivate',
+		// 	action: 'deactivateObject',
+		// 	disabled: true
+		// });
 		
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
@@ -47,7 +49,10 @@ Ext.define('AM.view.master.component.List' ,{
 
 
 		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton,
-		  	 ];
+		  			// '-', 
+		// this.deactivateObjectButton
+		
+		 ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
@@ -74,13 +79,13 @@ Ext.define('AM.view.master.component.List' ,{
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
-		this.deactivateObjectButton.enable();
+		// this.deactivateObjectButton.enable();
 		
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
-		this.deactivateObjectButton.disable();
+		// this.deactivateObjectButton.disable();
 	}
 });

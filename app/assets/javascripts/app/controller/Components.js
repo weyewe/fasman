@@ -101,7 +101,7 @@ Ext.define('AM.controller.Components', {
     
 		var parentObject  = this.getParentList().getSelectedObject();
 		if( parentObject) {
-			var view = Ext.widget('itemform');
+			var view = Ext.widget('componentform');
 			view.show();
 			view.setParentData(parentObject);
 		}
@@ -110,7 +110,7 @@ Ext.define('AM.controller.Components', {
   editObject: function() {
 		var me = this; 
     var record = this.getList().getSelectedObject();
-    var view = Ext.widget('itemform');
+    var view = Ext.widget('componentform');
 
 		view.setComboBoxData( record );
 
@@ -224,7 +224,7 @@ Ext.define('AM.controller.Components', {
 
 	deactivateObject: function(){
 		// console.log("mark as Deceased is clicked");
-		var view = Ext.widget('deactivateitemform');
+		var view = Ext.widget('deactivatecomponentform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
 		// view.down('form').getForm().findField('c').setValue(record.get('deceased_at')); 

@@ -24,6 +24,7 @@ Ticketie::Application.routes.draw do
     resources :contacts 
     resources :machines
     resources :components 
+    resources :compatibilities
     
     
   end
