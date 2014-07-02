@@ -1,6 +1,9 @@
 class Warehouse < ActiveRecord::Base
   has_many :items, :through => :warehouse_items 
   has_many :warehouse_items
+  has_many :delivery_orders
+  has_many :stock_adjustments
+  has_many :purchase_receivals 
   
    
   validates_presence_of :name  

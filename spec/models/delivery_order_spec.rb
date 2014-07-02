@@ -60,7 +60,8 @@ describe DeliveryOrder do
     @do = DeliveryOrder.create_object(
       :delivery_date  => DateTime.new(2012,2,2,0,0,0),
       :description    => "Awesome delivery order",
-      :sales_order_id     => @so.id 
+      :sales_order_id     => @so.id ,
+      :warehouse_id => @warehouse.id 
     )
     
     @do.should be_valid 
@@ -78,7 +79,8 @@ describe DeliveryOrder do
     @do = DeliveryOrder.create_object(
       :delivery_date  => DateTime.new(2012,2,2,0,0,0),
       :description    => "Awesome delivery order",
-      :sales_order_id     =>  nil
+      :sales_order_id     =>  nil,
+      :warehouse_id => @warehouse.id
     )
     
     @do.should_not be_valid
@@ -89,7 +91,8 @@ describe DeliveryOrder do
       @do = DeliveryOrder.create_object(
         :delivery_date  => DateTime.new(2012,2,2,0,0,0),
         :description    => "Awesome delivery receival",
-        :sales_order_id     => @so.id
+        :sales_order_id     => @so.id,
+        :warehouse_id => @warehouse.id
       )
     end
     
@@ -97,7 +100,8 @@ describe DeliveryOrder do
       @do.update_object(
         :delivery_date  => DateTime.new(2012,2,2,0,0,0),
         :description    => "Awesome delivery rec",
-        :sales_order_id     => @so.id
+        :sales_order_id     => @so.id,
+        :warehouse_id => @warehouse.id
       )
       
       @do.errors.size.should == 0 

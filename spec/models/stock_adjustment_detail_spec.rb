@@ -2,6 +2,11 @@ require 'spec_helper'
 
 describe StockAdjustmentDetail do
   before(:each) do
+    @warehouse = Warehouse.create_object(
+      :name => "warehouse awesome",
+      :description => "Badaboom"
+    )
+    
     @item1 = Item.create_object(
       :sku => "34242wafaw",
       :description => "awesome item"
@@ -14,7 +19,8 @@ describe StockAdjustmentDetail do
     
     @stock_adjustment = StockAdjustment.create_object(
       :adjustment_date  => DateTime.now , 
-      :description      => "awesome adjustment "
+      :description      => "awesome adjustment ",
+      :warehouse_id => @warehouse.id
     )
   end
   

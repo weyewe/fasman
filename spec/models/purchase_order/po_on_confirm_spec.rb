@@ -5,6 +5,11 @@ describe PurchaseOrderDetail do
     sku = "acedin3321"
     description = "awesome"
     standard_price = BigDecimal("80000")
+    @warehouse = Warehouse.create_object(
+      :name => "warehouse awesome",
+      :description => "Badaboom"
+    )
+    
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 
@@ -149,7 +154,8 @@ describe PurchaseOrderDetail do
         @pr = PurchaseReceival.create_object(
           :receival_date  => DateTime.new(2012,2,2,0,0,0),
           :description    => "Awesome purchase order",
-          :purchase_order_id     => @po.id 
+          :purchase_order_id     => @po.id ,
+          :warehouse_id => @warehouse.id 
         )
         
         @pr_detail = PurchaseReceivalDetail.create_object(

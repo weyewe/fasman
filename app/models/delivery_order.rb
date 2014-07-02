@@ -6,6 +6,8 @@ class DeliveryOrder < ActiveRecord::Base
   validate :valid_sales_order_id 
   validate :valid_warehouse_id
   
+  belongs_to :warehouse 
+  
   def valid_sales_order_id
     return  if not sales_order_id.present? 
     object = SalesOrder.find_by_id sales_order_id

@@ -1,7 +1,7 @@
 class SalesOrderDetail < ActiveRecord::Base
   belongs_to :sales_order 
   belongs_to :item 
-  has_many :sales_receival_details
+  has_many :delivery_order_details
   
   validates_presence_of :quantity,  :item_id 
   
@@ -101,8 +101,8 @@ class SalesOrderDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:addition] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:pending_delivery]   # stock_mutation_item_case
-     
+      STOCK_MUTATION_ITEM_CASE[:pending_delivery],   # stock_mutation_item_case
+      nil
      ) 
     item.update_stock_mutation( stock_mutation )
   end
@@ -122,6 +122,11 @@ class SalesOrderDetail < ActiveRecord::Base
   def unconfirmable?
     if pending_delivery != quantity
       self.errors.add(:generic_errors, "Sudah ada penerimaan barang")
+      return false 
+    end
+    
+    if delivery_order_details.count != 0
+      self.errors.add(:generic_errors, "sudah ada pengiriman barang")
       return false 
     end
     

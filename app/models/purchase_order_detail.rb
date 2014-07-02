@@ -145,6 +145,11 @@ class PurchaseOrderDetail < ActiveRecord::Base
       return false 
     end
     
+    if self.purchase_receival_details.count != 0 
+      self.errors.add(:generic_errors, "Sudah ada penerimaan")
+      return false  
+    end
+    
     # if the resulting unconfirm == negative, can't be 
     
     return true 

@@ -5,6 +5,12 @@ describe SalesOrderDetail do
     sku = "acedin3321"
     description = "awesome"
     standard_price = BigDecimal("80000")
+    
+    @warehouse = Warehouse.create_object(
+      :name => "warehouse awesome",
+      :description => "Badaboom"
+    )
+    
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 
@@ -50,7 +56,7 @@ describe SalesOrderDetail do
     @so.should be_valid 
   end
   
-  context "confirmed purchase order" do
+  context "confirmed sales order" do
     before(:each) do
       @item.reload
       @initial_item_pending_delivery = @item.pending_delivery
@@ -113,43 +119,105 @@ describe SalesOrderDetail do
          ).count.should == 0 
       end
     end
-  
-  
-    context "create  delivery to make the unconfirm action fail" do
+    
+    context "create stock adjustment to create quantity in warehouse" do
       before(:each) do
-        
-        @do = DeliveryOrder.create_object(
-          :delivery_date  => DateTime.new(2012,2,2,0,0,0),
-          :description    => "Awesome purchase order",
-          :sales_order_id     => @so.id 
+        @stock_adjustment = StockAdjustment.create_object(
+          :adjustment_date  => DateTime.now , 
+          :description      => "awesome adjustment ",
+          :warehouse_id => @warehouse.id
         )
         
-        @do_detail = DeliveryOrderDetail.create_object(
-          :delivery_order_id         => @do.id       ,
-          :sales_order_detail_id     => @so_detail.id     ,
-          :quantity                     => @quantity
+        @soe_quantity = 50
+        @soe = StockAdjustmentDetail.create_object(
+          :stock_adjustment_id => @stock_adjustment.id , 
+          :quantity => @soe_quantity, 
+          :item_id => @so_detail.item.id 
         )
         
-        @do.confirm_object(:confirmed_at => DateTime.now)
-        @so_detail.reload
-        @so.reload 
+        @stock_adjustment.confirm_object(:confirmed_at => DateTime.now - 2.days )
+        
+        @warehouse_item = WarehouseItem.where(
+          :item_id => @item.id,
+          :warehouse_id => @warehouse.id 
+        ).first 
+        
       end
       
-      it "should confirm pr" do
-        @do.errors.size.should ==0  
-        @do.is_confirmed.should be_true 
+      it "should create quantity in warehouse item" do
+        @warehouse_item.ready.should == @soe_quantity
       end
       
-      it "should not allow unconfirm in po_detail" do
-        @so_detail.unconfirmable?.should be_false 
-      end
       
-      it "should not allow unconfirm in po level" do
-        @so.unconfirm_object
-        @so.is_confirmed.should be_true 
-        @so.errors.size.should_not == 0 
+      context "create  delivery to make the unconfirm action fail" do
+        before(:each) do
+
+
+
+
+          @do = DeliveryOrder.create_object(
+            :delivery_date  => DateTime.new(2012,2,2,0,0,0),
+            :description    => "Awesome purchase order",
+            :sales_order_id     => @so.id  ,
+            :warehouse_id => @warehouse.id
+          )
+
+          @do_detail = DeliveryOrderDetail.create_object(
+            :delivery_order_id         => @do.id       ,
+            :sales_order_detail_id     => @so_detail.id     ,
+            :quantity                     => @quantity
+          )
+
+
+
+
+          @do.confirm_object(:confirmed_at => DateTime.now)
+          @so_detail.reload
+          @so.reload 
+          @do.reload
+
+
+          # @do_detail.reload 
+        end
+
+        it "should not create @do_detail" do
+          @do_detail.errors.messages.each {|x| puts "do_detail message #{x}"}
+          @do_detail.persisted?.should be_true
+
+        end
+
+        it "should confirm do" do
+          puts "Total do_detail: #{@do.delivery_order_details.count}"
+          @do.errors.messages.each {|x| puts "do confirm: #{x}"}
+          @do.is_confirmed.should be_true 
+        end
+
+
+
+        it "should confirm do" do
+          puts "Errror message in should confirm"
+          @do.errors.messages.each {|x| puts "err123: #{x}"}
+          @do.errors.size.should  == 0  
+
+          @do.is_confirmed.should be_true 
+        end
+        
+        it "should not allow unconfirm in so_detail" do
+          @so_detail.unconfirmable?.should be_false 
+        end
+        
+        # it "should not allow unconfirm in so level" do
+        #   @so.unconfirm_object
+        #   @so.is_confirmed.should be_true 
+        #   @so.errors.size.should_not == 0 
+        # end
+
       end
+
     end
+
+  
+  
   end
    
 

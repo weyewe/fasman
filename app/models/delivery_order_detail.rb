@@ -80,8 +80,8 @@ class DeliveryOrderDetail < ActiveRecord::Base
     
     if selected_warehouse_item.nil?
       return WarehouseItem.create_object(
-        :item_id => self.purchase_order_detail.item_id,
-        :warehouse_id =>  self.purchase_receival.warehouse_id
+        :item_id => self.sales_order_detail.item_id,
+        :warehouse_id =>  self.delivery_order.warehouse_id
       )
     else
       return selected_warehouse_item
@@ -92,10 +92,10 @@ class DeliveryOrderDetail < ActiveRecord::Base
   
   def enough_ready_item_in_warehouse
     return if not sales_order_detail_id.present?
-    return if not warehouse_id.present? 
+    return if not delivery_order_id.present? 
     
     if warehouse_item.ready  < self.quantity
-      self.errors.add(:quantity, "Not enough item in  warehouse #{warehouse.name}")
+      self.errors.add(:quantity, "Hanya ada #{warehouse_item.ready} di #{delivery_order.warehouse.name}")
       return self 
     end
   end
@@ -155,7 +155,8 @@ class DeliveryOrderDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
+      STOCK_MUTATION_ITEM_CASE[:ready] ,  # stock_mutation_item_case
+      delivery_order.warehouse_id 
      ) 
     item.update_stock_mutation( stock_mutation )
     warehouse_item.update_stock_mutation( stock_mutation )
@@ -164,9 +165,14 @@ class DeliveryOrderDetail < ActiveRecord::Base
       item, # the item 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:deduction] , # stock_mutation_case,
-      STOCK_MUTATION_ITEM_CASE[:pending_delivery]   # stock_mutation_item_case
+      STOCK_MUTATION_ITEM_CASE[:pending_delivery] ,  # stock_mutation_item_case
+      nil 
      )
     item.update_stock_mutation( stock_mutation )
+    
+    so_detail = sales_order_detail 
+    
+    so_detail.execute_delivery( -1* self.quantity ) 
     
     
   end
