@@ -1,14 +1,8 @@
-Ext.define('AM.model.Item', {
+Ext.define('AM.model.Contact', {
   	extend: 'Ext.data.Model',
   	fields: [
- 
-
     	{ name: 'id', type: 'int' },
-			{ name: 'pending_receival', type: 'int' },
-			{ name: 'ready', type: 'int' },
-			{ name: 'pending_delivery', type: 'int' },
-			
-    	{ name: 'sku', type: 'string' } ,
+			{ name: 'name', type: 'string' },
 			{ name: 'description', type: 'string' } 
   	],
 
@@ -17,19 +11,19 @@ Ext.define('AM.model.Item', {
 
    
   	idProperty: 'id' ,proxy: {
-			url: 'api/items',
+			url: 'api/contacts',
 			type: 'rest',
 			format: 'json',
 
 			reader: {
-				root: 'items',
+				root: 'contacts',
 				successProperty: 'success',
 				totalProperty : 'total'
 			},
 
 			writer: {
 				getRecordData: function(record) {
-					return { item : record.data };
+					return { contact : record.data };
 				}
 			}
 		}

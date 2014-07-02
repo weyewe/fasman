@@ -37,13 +37,10 @@ class Contact < ActiveRecord::Base
       return self 
     end
     
-    self.desroy 
+    self.destroy 
   end
-   
   
-  
-  
-  def active_objects
-    self.where(:is_deleted => false )
+  def self.active_objects
+    self
   end
 end

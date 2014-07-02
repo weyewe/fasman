@@ -1,43 +1,43 @@
-class Api::ItemsController < Api::BaseApiController
+class Api::ContactsController < Api::BaseApiController
   
   def index
     
-    
-    
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = Item.where{ 
+      @objects = Contact.active_objects.where{
+        (is_deleted.eq false) & 
         (
-          (description =~  livesearch ) | 
-          (sku =~  livesearch )
+          (name =~  livesearch )  
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = Item.where{ 
+      @total = Contact.active_objects.where{
+        (is_deleted.eq false) & 
         (
-          (description =~  livesearch ) | 
-          (sku  =~  livesearch )
+          (name =~  livesearch ) 
         )
+        
       }.count
-      
     else
-      @objects = Item.active_objects.
-                  page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = Item.active_objects.count
+      @objects = Contact.active_objects.page(params[:page]).per(params[:limit]).order("id DESC")
+      @total = Contact.active_objects.count
     end
     
+    
+    
+    # render :json => { :contacts => @objects , :total => @total, :success => true }
   end
 
   def create
-    @object = Item.create_object( params[:item] )  
+    @object = Contact.create_object( params[:contact] )  
     
     
  
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :items => [@object] , 
-                        :total => Item.active_objects.count }  
+                        :contacts => [@object] , 
+                        :total => Contact.active_objects.count }  
     else
       msg = {
         :success => false, 
@@ -52,13 +52,13 @@ class Api::ItemsController < Api::BaseApiController
 
   def update
     
-    @object = Item.find_by_id params[:id] 
-    @object.update_object( params[:item])
+    @object = Contact.find_by_id params[:id] 
+    @object.update_object( params[:contact])
      
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :items => [@object],
-                        :total => Item.active_objects.count  } 
+                        :contacts => [@object],
+                        :total => Contact.active_objects.count  } 
     else
       msg = {
         :success => false, 
@@ -72,20 +72,13 @@ class Api::ItemsController < Api::BaseApiController
   end
 
   def destroy
-    @object = Item.find(params[:id])
+    @object = Contact.find(params[:id])
     @object.delete_object
 
-    if  @object.errors.size == 0 
-      render :json => { :success => true, :total => Item.active_objects.count }  
+    if @object.is_deleted
+      render :json => { :success => true, :total => Contact.active_objects.count }  
     else
-      msg = {
-        :success => false, 
-        :message => {
-          :errors => extjs_error_format( @object.errors )  
-        }
-      }
-      
-      render :json => msg
+      render :json => { :success => false, :total => Contact.active_objects.count }  
     end
   end
   
@@ -100,30 +93,26 @@ class Api::ItemsController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = Item.where{ 
-                            (sku =~ query)  | 
-                            (description =~ query)
+      @objects = Contact.active_objects.where{ (name =~ query)   
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = Item.where{ 
-              (sku =~ query)  | 
-              (description =~ query)
+      @total = Contact.active_objects.where{ (name =~ query)  
                               }.count
     else
-      @objects = Item.where{ (id.eq selected_id)  
+      @objects = Contact.active_objects.where{ (id.eq selected_id)  
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
    
-      @total = Item.where{ (id.eq selected_id)   
+      @total = Contact.active_objects.where{ (id.eq selected_id)   
                               }.count 
     end
     
     
-    # render :json => { :records => @objects , :total => @total, :success => true }
+    render :json => { :records => @objects , :total => @total, :success => true }
   end
 end

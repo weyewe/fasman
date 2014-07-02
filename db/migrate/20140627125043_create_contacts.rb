@@ -10,6 +10,7 @@ class CreateContacts < ActiveRecord::Migration
       t.text :address
       t.text :shipping_address
 
+      
       t.timestamps
     end
   end

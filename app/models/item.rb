@@ -33,7 +33,7 @@ class Item < ActiveRecord::Base
     return new_object 
   end
   
-  def update_object
+  def update_object(params)
     self.sku = params[:sku]
     self.description = params[:description]
     self.save
@@ -42,12 +42,16 @@ class Item < ActiveRecord::Base
   end
   
   def delete_object
+    puts "checking if stock_mutations is zero"
     if self.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi")
       return self
     end
     
-    self.is_deleted = false
+    puts "stock_mutations: #{stock_mutations.count}"
+    
+    puts "this is awesome.. gonna delete"
+    self.is_deleted = true
     self.save 
   end
   

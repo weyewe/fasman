@@ -81,52 +81,30 @@ data_entry_role = Role.create!(
   
   customer_array = [customer_1, customer_2, customer_3 ]
   
-  item_type_pc = ItemType.create_object(
-    :name => "PC",
-    :description => "Seperangkat komputer: mouse, CPU, Monitor, Speaker (optional)"
-  )
-  
-  item_type_laptop = ItemType.create_object(
-    :name => "Laptop",
-    :description => "Awesome"
-  )
-  
-  item_type_array = [item_type_pc, item_type_laptop]
-  
-  
+  item_array = [] 
   (1..3).each do |x|
-    customer_array.each do |customer_object|
-      item_type_array.each do |type_object|
-        
-        a=  Item.create_object(
-          :customer_id              => customer_object.id,
-          :item_type_id                  => type_object.id,
-          :description              => "#{customer_object.name} #{type_object.name} #{x} ",
-          :manufactured_at          => DateTime.new(2011, 10,10), 
-          :warranty_expiry_date     => DateTime.new(2013, 10,10)
-        )
-        
-        a.errors.messages.each {|x| puts "Item error: #{x}"}
-      end
-    end
+    item = Item.create_object(
+      :sku => "SKU #{x}",
+      :description => "Awesome description #{x}"
+    )
+    
+    item_array << item 
   end
   
-  puts "Total item: #{Item.all.count}"
+  puts "Total item: #{Item.count}"
   
   
-   
-   customer = Customer.first
-   customer.items.each do |item|
-     Maintenance.create_object(
-       :item_id        => item.id, 
-       :customer_id    => customer.id           ,
-       :user_id        => User.first.id         ,
-       :complaint_date => DateTime.now          ,
-       :complaint      => "awesome complaint"   ,
-       :complaint_case => MAINTENANCE_CASE[:emergency]
-      )
-   end
+  contact_array = [] 
+  (1..3).each do |x|
+    contact = Contact.create_object(
+      :name             => "Contact #{x}"           ,
+      :description      => "Description #{x}"      ,
+      :address          =>  "Address #{x}"        ,
+      :shipping_address => "Shipping Address"
+    )
+    contact_array << contact 
+  end
   
   
-  puts "Total maintenance: #{Maintenance.all.count}"
+  puts "Total contact: #{Contact.count}"
   

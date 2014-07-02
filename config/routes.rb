@@ -21,6 +21,8 @@ Ticketie::Application.routes.draw do
     
     resources :maintenances
     
+    resources :contacts 
+    
     
   end
   

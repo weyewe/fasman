@@ -78,6 +78,7 @@ Ext.define("AM.controller.Master", {
 				}
 				]
 			},
+			
 			{ 
 				text:'Item Type', 
 				viewClass:'AM.view.master.ItemType', 
@@ -112,18 +113,18 @@ Ext.define("AM.controller.Master", {
 					}
 				]
 			},
-			// { 
-			// 	text:'Maintenance', 
-			// 	viewClass:'AM.view.master.Maintenance', 
-			// 	leaf:true, 
-			// 	iconCls:'text',
-			// 	conditions : [
-			// 		{
-			// 			controller : 'maintenances',
-			// 			action : 'index'
-			// 		}
-			// 	]
-			// },
+			{ 
+				text:'Contact', 
+				viewClass:'AM.view.master.Contact', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'contacts',
+					action : 'index'
+				}
+				]
+			},
     ]
 	},
 	   

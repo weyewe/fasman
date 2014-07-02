@@ -1,11 +1,11 @@
-Ext.define('AM.view.master.Item', {
+Ext.define('AM.view.master.Contact', {
     extend: 'AM.view.Worksheet',
-    alias: 'widget.itemProcess',
+    alias: 'widget.contactProcess',
 	 
 		
 		items : [
 			{
-				xtype : 'itemlist' ,
+				xtype : 'contactlist' ,
 				flex : 1 //,
 				// html : 'hahaha'
 			} 

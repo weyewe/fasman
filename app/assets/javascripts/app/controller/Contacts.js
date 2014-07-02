@@ -1,41 +1,41 @@
-Ext.define('AM.controller.Items', {
+Ext.define('AM.controller.Contacts', {
   extend: 'Ext.app.Controller',
 
-  stores: ['Items'],
-  models: ['Item'],
+  stores: ['Contacts'],
+  models: ['Contact'],
 
   views: [
-    'master.item.List',
-    'master.item.Form'
+    'master.contact.List',
+    'master.contact.Form'
   ],
 
   	refs: [
 		{
 			ref: 'list',
-			selector: 'itemlist'
+			selector: 'contactlist'
 		} 
 	],
 
   init: function() {
     this.control({
-      'itemlist': {
+      'contactlist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
 				afterrender : this.loadObjectList,
       },
-      'itemform button[action=save]': {
+      'contactform button[action=save]': {
         click: this.updateObject
       },
-      'itemlist button[action=addObject]': {
+      'contactlist button[action=addObject]': {
         click: this.addObject
       },
-      'itemlist button[action=editObject]': {
+      'contactlist button[action=editObject]': {
         click: this.editObject
       },
-      'itemlist button[action=deleteObject]': {
+      'contactlist button[action=deleteObject]': {
         click: this.deleteObject
 			}	,
-			'itemlist textfield[name=searchField]': {
+			'contactlist textfield[name=searchField]': {
 				change: this.liveSearch
 			}
 		
@@ -45,11 +45,11 @@ Ext.define('AM.controller.Items', {
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getItemsStore().getProxy().extraParams = {
+		me.getContactsStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getItemsStore().load();
+		me.getContactsStore().load();
 	},
  
 
@@ -59,13 +59,13 @@ Ext.define('AM.controller.Items', {
 	},
 
   addObject: function() {
-    var view = Ext.widget('itemform');
+    var view = Ext.widget('contactform');
     view.show();
   },
 
   editObject: function() {
     var record = this.getList().getSelectedObject();
-    var view = Ext.widget('itemform');
+    var view = Ext.widget('contactform');
 
     view.down('form').loadRecord(record);
 		view.setComboBoxData(record); 
@@ -75,7 +75,7 @@ Ext.define('AM.controller.Items', {
     var win = button.up('window');
     var form = win.down('form');
 
-    var store = this.getItemsStore();
+    var store = this.getContactsStore();
     var record = form.getRecord();
     var values = form.getValues();
 
@@ -104,7 +104,7 @@ Ext.define('AM.controller.Items', {
 		}else{
 			//  no record at all  => gonna create the new one 
 			var me  = this; 
-			var newObject = new AM.model.Item( values ) ;
+			var newObject = new AM.model.Contact( values ) ;
 			
 			// learnt from here
 			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
@@ -133,7 +133,7 @@ Ext.define('AM.controller.Items', {
     var record = this.getList().getSelectedObject();
 
     if (record) {
-      var store = this.getItemsStore();
+      var store = this.getContactsStore();
       store.remove(record);
       store.sync();
 // to do refresh programmatically

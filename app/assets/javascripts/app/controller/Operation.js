@@ -71,7 +71,7 @@ Ext.define("AM.controller.Operation", {
 	},
 	
 	emergencyFolder : {
-		text 			: "Emergency", 
+		text 			: "Setup", 
 		viewClass : '',
 		iconCls		: 'text-folder', 
     expanded	: true,
@@ -79,12 +79,12 @@ Ext.define("AM.controller.Operation", {
         
 			{ 
 				text:'Ticket', 
-				viewClass:'AM.view.operation.Item', 
+				viewClass:'AM.view.operation.contacts', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
 					{
-						controller : 'items',
+						controller : 'contacts',
 						action : 'index'
 					}
 				]
