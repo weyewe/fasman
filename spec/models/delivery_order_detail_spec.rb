@@ -60,11 +60,38 @@ describe DeliveryOrderDetail do
     @so_detail.reload
     @so.reload
     @item.reload 
+
+    @stock_adjustment = StockAdjustment.create_object(
+    :adjustment_date  => DateTime.now , 
+    :description      => "awesome adjustment ",
+    :warehouse_id => @warehouse.id
+    )
+
+    @soe_quantity = 50
+    @soe = StockAdjustmentDetail.create_object(
+    :stock_adjustment_id => @stock_adjustment.id , 
+    :quantity => @soe_quantity, 
+    :item_id => @item2.id 
+    )
+    
+    @soe2 = StockAdjustmentDetail.create_object(
+    :stock_adjustment_id => @stock_adjustment.id , 
+    :quantity => @soe_quantity, 
+    :item_id => @item.id 
+    )
+
+    @stock_adjustment.confirm_object(:confirmed_at => DateTime.now - 2.days )
+
+    @warehouse_item = WarehouseItem.where(
+    :item_id => @item.id,
+    :warehouse_id => @warehouse.id 
+    ).first 
     
     @do = DeliveryOrder.create_object(
       :delivery_date  => DateTime.new(2012,2,2,0,0,0),
       :description    => "Awesome purchase order",
-      :sales_order_id     => @so.id 
+      :sales_order_id     => @so.id ,
+      :warehouse_id => @warehouse.id
     )
   end
   
@@ -92,7 +119,7 @@ describe DeliveryOrderDetail do
     @do_detail.should_not be_valid
   end
   
-  context "created pr_detail" do
+  context "created po_detail" do
     before(:each) do
       @delivered_quantity = 1 
     

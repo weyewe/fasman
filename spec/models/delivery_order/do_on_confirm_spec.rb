@@ -57,14 +57,39 @@ describe DeliveryOrderDetail do
   
   context "creating delivery order" do
     before(:each) do
+      
+      @stock_adjustment = StockAdjustment.create_object(
+      :adjustment_date  => DateTime.now , 
+      :description      => "awesome adjustment ",
+      :warehouse_id => @warehouse.id
+      )
+
+      @soe_quantity = 50
+      @soe = StockAdjustmentDetail.create_object(
+      :stock_adjustment_id => @stock_adjustment.id , 
+      :quantity => @soe_quantity, 
+      :item_id => @item2.id 
+      )
+
+      @soe2 = StockAdjustmentDetail.create_object(
+      :stock_adjustment_id => @stock_adjustment.id , 
+      :quantity => @soe_quantity, 
+      :item_id => @item.id 
+      )
+
+      @stock_adjustment.confirm_object(:confirmed_at => DateTime.now - 2.days )
+      
       @item.reload 
       @initial_pending_delivery = @item.pending_delivery
       @initial_ready = @item.ready
       
+      
+      
       @do = DeliveryOrder.create_object(
          :delivery_date  => DateTime.new(2012,2,2,0,0,0),
          :description    => "Awesome sales order",
-         :sales_order_id     => @so.id 
+         :sales_order_id     => @so.id ,
+         :warehouse_id => @warehouse.id
        )
 
        @do_detail = DeliveryOrderDetail.create_object(

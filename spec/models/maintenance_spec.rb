@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe Maintenance do
   before(:each) do
+    @warehouse = Warehouse.create_object(
+      :name => "warehouse awesome",
+      :description => "Badaboom"
+    )
     @machine = Machine.create_object(
       :name => "34242wafaw",
       :brand => "Yokoko",
@@ -49,7 +53,8 @@ describe Maintenance do
     
     @stock_adjustment = StockAdjustment.create_object(
       :adjustment_date  => DateTime.now , 
-      :description      => "awesome adjustment "
+      :description      => "awesome adjustment ",
+      :warehouse_id => @warehouse.id 
     )
     
     @quantity1 = 5
@@ -70,7 +75,8 @@ describe Maintenance do
       :asset_id       => @asset.id ,
       :complaint_date => DateTime.now , 
       :complaint      => "This is broken!! fuuuck! ",
-      :complaint_case => MAINTENANCE_CASE[:emergency]
+      :complaint_case => MAINTENANCE_CASE[:emergency],
+      :warehouse_id => @warehouse.id
     )
     
     maintenance.errors.size.should_not == 0 
@@ -85,7 +91,8 @@ describe Maintenance do
       :asset_id       => @asset.id ,
       :complaint_date => DateTime.now , 
       :complaint      => "This is broken!! fuuuck! ",
-      :complaint_case => MAINTENANCE_CASE[:emergency]
+      :complaint_case => MAINTENANCE_CASE[:emergency],
+      :warehouse_id => @warehouse.id
     )
     
     maintenance.errors.size.should == 0
@@ -104,7 +111,8 @@ describe Maintenance do
         :asset_id       => @asset.id ,
         :complaint_date => DateTime.now , 
         :complaint      => "This is broken!! fuuuck! ",
-        :complaint_case => MAINTENANCE_CASE[:emergency]
+        :complaint_case => MAINTENANCE_CASE[:emergency],
+        :warehouse_id => @warehouse.id
       )
     end
     
