@@ -108,3 +108,16 @@ data_entry_role = Role.create!(
   
   puts "Total contact: #{Contact.count}"
   
+  machine_array = [] 
+  (1..3).each do |x|
+    machine = Machine.create_object(
+      :name             => "Name #{x}"           ,
+      :description      => "Description #{x}"      ,
+      :brandh          =>  "Brand #{x}"        
+    )
+    machine_array << machine 
+  end
+  
+  
+  puts "Total machine: #{Machine.count}"
+  

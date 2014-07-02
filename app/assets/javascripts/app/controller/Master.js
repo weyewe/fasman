@@ -79,23 +79,23 @@ Ext.define("AM.controller.Master", {
 				]
 			},
 			
-			{ 
-				text:'Item Type', 
-				viewClass:'AM.view.master.ItemType', 
-				leaf:true, 
-				iconCls:'text',
-				conditions : [
-					{
-						controller : 'item_types',
-						action : 'index'
-					}
-				]
-			} 
+			// { 
+			// 	text:'Item Type', 
+			// 	viewClass:'AM.view.master.ItemType', 
+			// 	leaf:true, 
+			// 	iconCls:'text',
+			// 	conditions : [
+			// 		{
+			// 			controller : 'item_types',
+			// 			action : 'index'
+			// 		}
+			// 	]
+			// } 
     ]
 	},
 	
 	customerSetupFolder : {
-		text 			: "CustomerSetup", 
+		text 			: "Operation Setup", 
 		viewClass : '',
 		iconCls		: 'text-folder', 
     expanded	: true,
@@ -121,6 +121,31 @@ Ext.define("AM.controller.Master", {
 				conditions : [
 				{
 					controller : 'contacts',
+					action : 'index'
+				}
+				]
+			},
+			
+			{ 
+				text:'Machine', 
+				viewClass:'AM.view.master.Machine', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'machines',
+					action : 'index'
+				}
+				]
+			},
+			{ 
+				text:'Component', 
+				viewClass:'AM.view.master.Component', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'components',
 					action : 'index'
 				}
 				]
