@@ -23,7 +23,7 @@ Ext.define('AM.controller.StockAdjustments', {
 		},
 		{
 			ref: 'list',
-			selector: 'stockadjustmentdetaillist'
+			selector: 'stockadjustmentProcess stockadjustmentdetaillist'
 		},
 		{
 			ref : 'searchField',
@@ -37,7 +37,7 @@ Ext.define('AM.controller.StockAdjustments', {
 				afterrender : this.loadParentObjectList,
 				selectionchange: this.parentSelectionChange,
 				
-				destroy : this.onParentDestroy
+				destroy : this.onParentDestroy 
 			},
 			
 		 
@@ -54,6 +54,23 @@ Ext.define('AM.controller.StockAdjustments', {
       'stockadjustmentProcess stockadjustmentlist button[action=deleteObject]': {
         click: this.deleteParentObject
       },
+
+			'stockadjustmentProcess stockadjustmentlist button[action=confirmObject]': {
+        click: this.confirmObject
+			}	,
+			
+			'confirmstockadjustmentform button[action=confirm]' : {
+				click : this.executeConfirm
+			},
+			
+			'stockadjustmentProcess stockadjustmentlist button[action=unconfirmObject]': {
+        click: this.unconfirmObject
+			}	,
+			
+			'unconfirmstockadjustmentform button[action=unconfirm]' : {
+				click : this.executeUnconfirm
+			},
+			
 			'stockadjustmentProcess stockadjustmentlist textfield[name=searchField]': {
         change: this.liveSearch
       },
@@ -89,7 +106,7 @@ Ext.define('AM.controller.StockAdjustments', {
 		
     });
   },
-
+ 
 	onParentDestroy: function(){
 		this.getStockAdjustmentDetailsStore().loadData([],false);
 	},
@@ -429,9 +446,11 @@ Ext.define('AM.controller.StockAdjustments', {
 
     if (selections.length > 0) {
 			grid.enableAddButton();
+			parentList.enableRecordButtons();
       // grid.enableRecordButtons();
     } else {
 			grid.disableAddButton();
+			parentList.disableRecordButtons();
       // grid.disableRecordButtons();
     }
 		
@@ -450,5 +469,139 @@ Ext.define('AM.controller.StockAdjustments', {
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;
 		grid.getStore().load(); 
   },
+
+
+	confirmObject: function(){
+		var view = Ext.widget('confirmstockadjustmentform');
+		var record = this.getParentList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	unconfirmObject: function(){
+		var view = Ext.widget('unconfirmstockadjustmentform');
+		var record = this.getParentList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	reloadRecord: function(record){
+		// console.log("Inside reload record");
+		// console.log( record );
+		var list = this.getParentList();
+		var store = this.getParentList().getStore();
+		var modifiedId = record.get('id');
+		
+		AM.model.StockAdjustment.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, master) {
+		        //do something if the load failed
+		    },
+		    success: function(record, master) {
+			
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(record.getData());
+					recToUpdate.commit();
+					list.getView().refreshNode(store.indexOfId(modifiedId));
+					list.enableRecordButtons();
+		    },
+		    callback: function(record, master) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
+	
+	
+	executeConfirm: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+		var parentList  = this.getParentList();
+
+    var store = this.getStockAdjustmentsStore();
+		var record = this.getParentList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					confirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					// store.load();
+					// parentList.enableRecordButtons();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	executeUnconfirm: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getStockAdjustmentsStore();
+		var record = this.getParentList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unconfirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					// store.load();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
 
 });

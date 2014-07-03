@@ -2,29 +2,29 @@ Ext.define('AM.view.operation.stockadjustmentdetail.List' ,{
   	extend: 'Ext.grid.Panel',
   	alias : 'widget.stockadjustmentdetaillist',
 
-  	store: 'StockAdjustments', 
+  	store: 'StockAdjustmentDetails', 
  
 
 	initComponent: function() {
 		this.columns = [
-			{ header: 'ID', dataIndex: 'id'},
-			{ header: 'Nama',  dataIndex: 'name', flex: 1},
-			{	header: 'Deskripsi', dataIndex: 'description', flex: 1 }, 
+			{ header: 'Item SKU',  dataIndex: 'item_sku', flex: 1},
+			{	header: 'Quantity', dataIndex: 'quantity', flex: 1 }, 
 		];
 
 		this.addObjectButton = new Ext.Button({
-			text: 'Add StockAdjustment',
-			action: 'addObject'
+			text: 'Add',
+			action: 'addObject',
+			disabled : true 
 		});
 
 		this.editObjectButton = new Ext.Button({
-			text: 'Edit StockAdjustment',
+			text: 'Edit',
 			action: 'editObject',
 			disabled: true
 		});
 
 		this.deleteObjectButton = new Ext.Button({
-			text: 'Delete StockAdjustment',
+			text: 'Delete',
 			action: 'deleteObject',
 			disabled: true
 		});
@@ -39,7 +39,7 @@ Ext.define('AM.view.operation.stockadjustmentdetail.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton, this.searchField ];
+		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
@@ -54,6 +54,14 @@ Ext.define('AM.view.operation.stockadjustmentdetail.List' ,{
 	
 	getSelectedObject: function() {
 		return this.getSelectionModel().getSelection()[0];
+	},
+	
+	enableAddButton : function(){
+		this.addObjectButton.enable();
+	},
+	
+	disableAddButton : function(){
+		this.addObjectButton.disable();
 	},
 
 	enableRecordButtons: function() {

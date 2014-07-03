@@ -62,38 +62,6 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.datetime "updated_at"
   end
 
-  create_table "contract_items", force: true do |t|
-    t.integer  "contract_maintenance_id"
-    t.integer  "customer_id"
-    t.integer  "item_id"
-    t.boolean  "is_deleted",              default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "contract_maintenances", force: true do |t|
-    t.integer  "customer_id"
-    t.string   "name"
-    t.text     "description"
-    t.string   "code"
-    t.datetime "started_at"
-    t.datetime "finished_at"
-    t.boolean  "is_deleted",  default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "customers", force: true do |t|
-    t.string   "name"
-    t.text     "address"
-    t.text     "pic"
-    t.text     "contact"
-    t.string   "email"
-    t.boolean  "is_deleted", default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "delivery_order_details", force: true do |t|
     t.integer  "delivery_order_id"
     t.integer  "sales_order_detail_id"
@@ -152,15 +120,6 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.integer  "solution_case"
     t.boolean  "is_replacement_required", default: false
     t.integer  "replacement_item_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "maintenance_schedules", force: true do |t|
-    t.integer  "contract_maintenance_id"
-    t.datetime "maintenance_date"
-    t.integer  "customer_id"
-    t.boolean  "is_deleted"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -291,14 +250,6 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.integer  "item_case"
     t.datetime "mutation_date"
     t.integer  "warehouse_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "types", force: true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.boolean  "is_deleted",  default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

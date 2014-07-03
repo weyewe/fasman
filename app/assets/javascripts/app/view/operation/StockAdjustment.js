@@ -18,7 +18,7 @@ Ext.define('AM.view.operation.StockAdjustment', {
 				
 				{
 					xtype : 'stockadjustmentdetaillist',
-					flex : 5
+					flex : 2
 				}, 
 		]
 });

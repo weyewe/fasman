@@ -12,7 +12,39 @@ Ext.define('AM.view.operation.stockadjustment.Form', {
 	
   initComponent: function() {
 	
-	
+		var remoteJsonStoreWarehouse = Ext.create(Ext.data.JsonStore, {
+			storeId : 'warehouse_search',
+			fields	: [
+			 		{
+						name : 'warehouse_name',
+						mapping : "name"
+					} ,
+					{
+						name : 'warehouse_description',
+						mapping : "description"
+					} ,
+					
+					{
+						name : 'warehouse_id',
+						mapping : "id"
+					}  
+			],
+			
+		 
+			proxy  	: {
+				extraParams : {
+					parent_id : null
+				},
+				type : 'ajax',
+				url : 'api/search_warehouse',
+				reader : {
+					type : 'json',
+					root : 'records', 
+					totalProperty  : 'total'
+				}
+			},
+			autoLoad : false 
+		});
 	
 	  
     this.items = [{
@@ -31,15 +63,40 @@ Ext.define('AM.view.operation.stockadjustment.Form', {
 	        fieldLabel: 'id'
 	      },
 				{
-	        xtype: 'textfield',
-	        name : 'name',
-	        fieldLabel: ' Name PT StockAdjustment'
-	      },
+					fieldLabel: 'Warehouse',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'warehouse_name',
+					valueField : 'warehouse_id',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : remoteJsonStoreWarehouse , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{warehouse_name}">' + 
+													'<div class="combo-name">{warehouse_name}</div>' +   
+													'<div>{warehouse_description}</div>' + 
+							 					'</div>';
+						}
+					},
+					name : 'warehouse_id' 
+				},
+				
+				{
+					xtype: 'datefield',
+					name : 'adjustment_date',
+					fieldLabel: 'Tanggal Adjustment',
+					format: 'Y-m-d',
+				},
+				
 				{
 					xtype: 'textfield',
 					name : 'description',
 					fieldLabel: 'Deskripsi'
-				}
+				},
 				
 			]
     }];

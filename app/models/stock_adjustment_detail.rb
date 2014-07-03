@@ -9,6 +9,8 @@ class StockAdjustmentDetail < ActiveRecord::Base
   validate :non_negative_final_quantity_in_warehouse 
   
   validate :valid_item_id
+  validate :unique_item_in_stock_adjustment_detail
+  
   
   def valid_item_id
     return  if not item_id.present? 
@@ -67,6 +69,7 @@ class StockAdjustmentDetail < ActiveRecord::Base
   def non_negative_final_quantity_in_warehouse
     return if not stock_adjustment_id.present? 
     return if not item_id.present?
+    return if not quantity.present?
     
     if quantity < 0 
       if warehouse_item.ready  + quantity < 0 
@@ -76,13 +79,49 @@ class StockAdjustmentDetail < ActiveRecord::Base
     end
     
   end
+  
+  def unique_item_in_stock_adjustment_detail
+    return if not ( item_id.present? ) 
+    
+    object_count  = StockAdjustmentDetail.where(
+      :item_id => item_id,
+      :stock_adjustment_id => stock_adjustment_id
+    ).count 
+    
+    object = StockAdjustmentDetail.where(
+      :item_id => item_id,
+      :stock_adjustment_id => stock_adjustment_id
+    ).first
+    
+    if self.persisted? and object.id != self.id   and object_count == 1
+      self.errors.add(:item_id, "Sudah ada Item seperti ini")
+      return self 
+    end
+    
+    # there is item with such item_id in the database
+    if not self.persisted? and object_count != 0 
+      self.errors.add(:item_id, "Sudah ada Item seperti ini")
+      return self
+    end
+  end
    
   
   def self.create_object( params ) 
+    
+      
+    
     new_object = self.new
     new_object.stock_adjustment_id = params[:stock_adjustment_id ]
     new_object.item_id = params[:item_id]
     new_object.quantity = params[:quantity]
+    
+    if new_object.stock_adjustment_id.present?
+      if new_object.stock_adjustment.is_confirmed?
+        new_object.errors.add(:generic_errors, "Sudah konfirmasi")
+        return new_object 
+      end
+    end
+    
     new_object.save 
     
     return new_object
@@ -146,6 +185,9 @@ class StockAdjustmentDetail < ActiveRecord::Base
     item.update_stock_mutation( stock_mutation ) 
     warehouse_item.update_stock_mutation(stock_mutation) 
     
+    self.is_confirmed = true
+    self.save
+    
      
   end
   
@@ -174,6 +216,10 @@ class StockAdjustmentDetail < ActiveRecord::Base
     warehouse_item.reverse_stock_mutation( stock_mutation )
     stock_mutation.destroy
     
+  end
+  
+  def self.active_objects
+    return self 
   end
   
    

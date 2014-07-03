@@ -1,5 +1,8 @@
 class StockAdjustment < ActiveRecord::Base
   has_many :stock_adjustment_details 
+  belongs_to :warehouse 
+  
+  
   validates_presence_of :adjustment_date 
   
   validates_presence_of :warehouse_id

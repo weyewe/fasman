@@ -55,33 +55,7 @@ data_entry_role = Role.create!(
 
 
   
-  customer_1 = Customer.create_object(
-    :name        => "mcnell", 
-    :address     => " kalibesar no 50 ", 
-    :pic         => " WILLY ", 
-    :contact     => "082125583534", 
-    :email       => "walawee@gmail.com", 
-  )
-  
-  customer_2 = Customer.create_object(
-    :name        => "toll", 
-    :address     => " kalibesar no 50 ", 
-    :pic         => " WILLY ", 
-    :contact     => "082125583534", 
-    :email       => "toll@gmail.com", 
-  )
-  
-  customer_3 = Customer.create_object(
-    :name        => "penanshin", 
-    :address     => " kalibesar no 50 ", 
-    :pic         => " WILLY ", 
-    :contact     => "082125583534", 
-    :email       => "toll@gmail.com", 
-  )
-  
-  customer_array = [customer_1, customer_2, customer_3 ]
-  
-  item_array = [] 
+   item_array = [] 
   (1..3).each do |x|
     item = Item.create_object(
       :sku => "SKU #{x}",
@@ -113,7 +87,7 @@ data_entry_role = Role.create!(
     machine = Machine.create_object(
       :name             => "Name #{x}"           ,
       :description      => "Description #{x}"      ,
-      :brandh          =>  "Brand #{x}"        
+      :brand          =>  "Brand #{x}"        
     )
     machine_array << machine 
   end
@@ -141,3 +115,37 @@ data_entry_role = Role.create!(
   end
   
   puts "Total compatibility: #{Compatibility.count}" 
+  
+
+  (1..3).each do |x|
+    Warehouse.create_object(
+      :name             => "Gudang #{x}"           ,
+      :description      => "Description #{x}"       
+    )
+  end
+  
+  puts "Total warehouse: #{Warehouse.count}" 
+  
+  (1..3).each do |x|
+    StockAdjustment.create_object(
+      :adjustment_date             => DateTime.now - 2.days         ,
+      :description      => "description stock adjustment #{x}"      ,
+      :warehouse_id => Warehouse.first.id 
+    )
+  end
+  
+  puts "Total stock adjustment: #{StockAdjustment.count}" 
+  
+  item_array  = Item.all 
+  StockAdjustment.all.each do |sa|
+    (1..3).each do |x|
+      StockAdjustmentDetail.create_object(
+        :item_id => item_array[x-1].id,
+        :quantity => 10, 
+        :stock_adjustment_id => sa.id 
+      )
+    end
+  end
+  
+  puts "Total stock adjustment detail: #{StockAdjustmentDetail.count}"
+  

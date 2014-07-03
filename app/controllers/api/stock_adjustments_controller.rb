@@ -28,13 +28,24 @@ class Api::StockAdjustmentsController < Api::BaseApiController
   end
 
   def create
+    
+    params[:stock_adjustment][:adjustment_date] = parse_date_from_client_booking( params[:stock_adjustment][:adjustment_date] ) 
     @object = StockAdjustment.create_object( params[:stock_adjustment] )  
     
     
  
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :stock_adjustments => [@object] , 
+                        :stock_adjustments => [
+                            :id              =>  @object.id             , 
+                            :warehouse_id    =>  @object.warehouse_id   , 
+                            :warehouse_name  =>  @object.warehouse.name , 
+                            :is_confirmed    =>  @object.is_confirmed   ,  
+                            :is_deleted      =>  @object.is_deleted     , 
+                            :description     =>  @object.description    ,       
+                            :adjustment_date =>  format_date_friendly( @object.adjustment_date )  ,  
+                            :confirmed_at    =>  format_date_friendly( @object.confirmed_at )
+                          ] , 
                         :total => StockAdjustment.active_objects.count }  
     else
       msg = {
@@ -50,12 +61,45 @@ class Api::StockAdjustmentsController < Api::BaseApiController
 
   def update
     
+    params[:stock_adjustment][:adjustment_date] = parse_date( params[:stock_adjustment][:adjustment_date] )
+    params[:stock_adjustment][:confirmed_at] = parse_date( params[:stock_adjustment][:confirmed_at] ) 
+    
     @object = StockAdjustment.find_by_id params[:id] 
-    @object.update_object( params[:stock_adjustment])
+    
+    if params[:confirm].present?  
+      
+      if not current_user.has_role?( :stock_adjustments, :confirm)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      @object.confirm_object(:confirmed_at => params[:stock_adjustment][:confirmed_at] )
+    elsif params[:unconfirm].present?
+      
+      if not current_user.has_role?( :stock_adjustments, :unconfirm)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      @object.unconfirm_object 
+    else
+      @object.update_object(params[:stock_adjustment])
+    end
+     
      
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :stock_adjustments => [@object],
+                        :stock_adjustments => [
+                          :id              =>  @object.id             , 
+                          :warehouse_id    =>  @object.warehouse_id   , 
+                          :warehouse_name  =>  @object.warehouse.name , 
+                          :is_confirmed    =>  @object.is_confirmed   ,  
+                          :is_deleted      =>  @object.is_deleted     , 
+                          :description     =>  @object.description    ,       
+                          :adjustment_date =>  format_date_friendly( @object.adjustment_date )  ,  
+                          :confirmed_at    =>  format_date_friendly( @object.confirmed_at )
+
+                          ],
                         :total => StockAdjustment.active_objects.count  } 
     else
       msg = {
@@ -67,6 +111,24 @@ class Api::StockAdjustmentsController < Api::BaseApiController
       
       render :json => msg 
     end
+  end
+  
+  def show
+    @object = StockAdjustment.find_by_id params[:id] 
+    render :json => { :success => true, 
+                      :stock_adjustments => [
+                          :id              =>  @object.id             , 
+                          :warehouse_id    =>  @object.warehouse_id   , 
+                          :warehouse_name  =>  @object.warehouse.name , 
+                          :is_confirmed    =>  @object.is_confirmed   ,  
+                          :is_deleted      =>  @object.is_deleted     , 
+                          :description     =>  @object.description    ,       
+                          :adjustment_date =>  format_date_friendly( @object.adjustment_date )  ,  
+                          :confirmed_at    =>  format_date_friendly( @object.confirmed_at )
+                        	
+                        	
+                        ] , 
+                      :total => StockAdjustment.active_objects.count }
   end
 
   def destroy
