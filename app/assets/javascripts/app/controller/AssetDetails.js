@@ -21,7 +21,7 @@ Ext.define('AM.controller.AssetDetails', {
 		},
 		{
 			ref : 'parentList1',
-			selector : 'assetdetailProcess operationcontactassetList operationcontactList'
+			selector : 'assetdetailProcess operationcontactassetList mastercontactList'
 		},
 		
 		{
@@ -34,7 +34,7 @@ Ext.define('AM.controller.AssetDetails', {
 		},
 		{
 			ref : 'searchField1',
-			selector: 'assetdetailProcess operationcontactassetList operationcontactList textfield[name=searchField]'
+			selector: 'assetdetailProcess operationcontactassetList mastercontactList textfield[name=searchField]'
 		},
 		{
 			ref : 'searchField2',
@@ -48,7 +48,7 @@ Ext.define('AM.controller.AssetDetails', {
 
   init: function() {
     this.control({
-			'assetdetailProcess operationcontactassetList operationcontactList' : {
+			'assetdetailProcess operationcontactassetList mastercontactList' : {
 				afterrender : this.loadParentObjectList1,
 				selectionchange: this.parentSelectionChange1,
 			},
@@ -90,6 +90,7 @@ Ext.define('AM.controller.AssetDetails', {
   },
 
 	loadParentObjectList1 : function(me){
+		console.log("nside load parent objct list 1");
 		var currentController = this; 
 		
 		var parentList1 = currentController.getParentList1();

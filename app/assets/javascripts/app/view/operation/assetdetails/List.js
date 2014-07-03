@@ -8,9 +8,8 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 	initComponent: function() {
 		this.columns = [
 			// { header: 'Member', dataIndex: 'member_name' , flex : 1 },
-			{ header: 'AssignedItem',  dataIndex: 'code', flex : 1  },
-			{ header: 'Component',  dataIndex: 'name', flex : 1  },
-			{ header: 'Description',  dataIndex: 'description', flex : 1  },
+			{ header: 'Component',  dataIndex: 'component_name', flex : 1  },
+			{ header: 'Current Item',  dataIndex: 'current_item_name', flex : 1  },
 			
 		];
 
@@ -48,7 +47,7 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton,
+		this.tbar = [this.addObjectButton,   
 		  			// '-', 
 		// this.deactivateObjectButton
 		

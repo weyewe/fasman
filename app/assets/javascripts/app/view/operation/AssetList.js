@@ -12,7 +12,7 @@ Ext.define('AM.view.operation.AssetList' ,{
 				xtype : 'templatecolumn',
 				text : "Asset",
 				flex : 1,
-				tpl : '<b>{name}</b>' 
+				tpl : '<b>{code}</b>' 
 				
 			}, 
 		];

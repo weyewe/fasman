@@ -79,4 +79,17 @@ class AssetDetail < ActiveRecord::Base
   def self.active_objects
     self 
   end
+  
+  def initial_item
+    return nil if initial_item_id.nil?
+    
+    return Item.find_by_id initial_item_id 
+  end
+  
+  
+  def current_item
+    return nil if current_item_id.nil?
+    
+    return Item.find_by_id current_item_id
+  end
 end

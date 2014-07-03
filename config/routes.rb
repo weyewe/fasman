@@ -19,6 +19,7 @@ Ticketie::Application.routes.draw do
     get 'search_sales_order' => 'sales_orders#search', :as => :search_sales_order, :method => :get
     get 'search_sales_order_detail' => 'sales_order_details#search', :as => :search_sales_order_detail, :method => :get
     get 'search_machine' => 'machines#search', :as => :search_machine, :method => :get
+    get 'search_component' => 'components#search', :as => :search_component, :method => :get
     
     # master data 
     resources :app_users
@@ -48,6 +49,8 @@ Ticketie::Application.routes.draw do
     resources :delivery_orders
     resources :delivery_order_details
     resources :assets
+    
+    resources :asset_details
     
     
   end

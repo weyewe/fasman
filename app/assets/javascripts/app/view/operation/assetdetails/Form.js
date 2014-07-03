@@ -1,6 +1,6 @@
-Ext.define('AM.view.master.part.Form', {
+Ext.define('AM.view.operation.assetdetail.Form', {
   extend: 'Ext.window.Window',
-  alias : 'widget.partform',
+  alias : 'widget.assetdetailform',
 
   title : 'Add / Edit Part',
   layout: 'fit',
@@ -13,6 +13,31 @@ Ext.define('AM.view.master.part.Form', {
   initComponent: function() {
 		var me = this; 
 	  
+		var remoteJsonStoreComponent = Ext.create(Ext.data.JsonStore, {
+			storeId : 'component_search',
+			fields	: [
+			 		{
+						name : 'component_name',
+						mapping : "name"
+					} ,
+					{
+						name : 'component_id',
+						mapping : "id"
+					}  
+			],
+			
+		 
+			proxy  	: {
+				type : 'ajax',
+				url : 'api/search_component',
+				reader : {
+					type : 'json',
+					root : 'records', 
+					totalProperty  : 'total'
+				}
+			},
+			autoLoad : false 
+		});
 		 
 		
 		
@@ -35,26 +60,37 @@ Ext.define('AM.view.master.part.Form', {
 	      },
 				{
 	        xtype: 'hidden',
-	        name : 'group_id',
-	        fieldLabel: 'Group ID'
+	        name : 'asset_id',
+	        fieldLabel: 'Asset ID'
 	      },
 				{
 					xtype: 'displayfield',
-					fieldLabel: 'Group',
-					name: 'group_name' ,
+					fieldLabel: 'Asset',
+					name: 'asset_code' ,
 					value : '10' 
 				},
 				{
-					xtype: 'textfield',
-					fieldLabel: 'Name',
-					name: 'name'  
+					fieldLabel: 'Component',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'component_name',
+					valueField : 'component_id',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : remoteJsonStoreComponent , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{component_name}">' + 
+													'<div class="combo-name">{component_name}</div>' +  
+							 					'</div>';
+						}
+					},
+					name : 'component_id' 
 				},
-				{
-					xtype: 'textarea',
-					name : 'description',
-					fieldLabel: 'Deskripsi'
-				},
-				
+			
 			]
     }];
 
@@ -72,7 +108,10 @@ Ext.define('AM.view.master.part.Form', {
   },
 
 
+	
+
 	setComboBoxData : function( record){ 
+	 
 	},
 	
 	setParentData1: function( record ){
@@ -80,8 +119,8 @@ Ext.define('AM.view.master.part.Form', {
 	},
 	
 	setParentData2: function( record ){
-		this.down('form').getForm().findField('group_name').setValue(record.get('name')); 
-		this.down('form').getForm().findField('group_id').setValue(record.get('id')); 
+		this.down('form').getForm().findField('asset_code').setValue(record.get('code')); 
+		this.down('form').getForm().findField('asset_id').setValue(record.get('id')); 
 	},
 });
 
