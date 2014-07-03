@@ -48,24 +48,42 @@ Ext.define("AM.controller.Operation", {
 	 
 
 	scheduledFolder : {
-		text 			: "Scheduled", 
+		text 			: "ASSET Builder", 
 		viewClass : '',
 		iconCls		: 'text-folder', 
     expanded	: true,
 		children 	: [
         
+// select customer. then create the asset 
 			{ 
-				text:'Maintenance A', 
-				viewClass:'AM.view.operation.Maintenance', 
+				text:'Asset', 
+				viewClass:'AM.view.operation.Asset', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
 				{
-					controller : 'maintenances',
+					controller : 'assets',
 					action : 'index'
 				}
 				]
 			}, 
+			
+		// select customer, select asset, then assign current item or add new component 
+			{ 
+				text:'Asset Setup', 
+				viewClass:'AM.view.operation.AssetDetail', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'assets',
+					action : 'index'
+				}
+				]
+			},
+			
+			// do maintenance
+			
 			 
     ]
 	},
