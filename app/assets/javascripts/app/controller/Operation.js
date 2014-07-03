@@ -70,6 +70,29 @@ Ext.define("AM.controller.Operation", {
     ]
 	},
 	
+	stockFolder : {
+		text 			: "Stock", 
+		viewClass : '',
+		iconCls		: 'text-folder', 
+    expanded	: true,
+		children 	: [
+        
+			{ 
+				text:'Stock Adjustment', 
+				viewClass:'AM.view.operation.StockAdjustment', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'stock_adjustments',
+					action : 'index'
+				}
+				]
+			}, 
+			 
+    ]
+	},
+	
 	emergencyFolder : {
 		text 			: "Setup", 
 		viewClass : '',
@@ -112,6 +135,7 @@ Ext.define("AM.controller.Operation", {
 		
 		me.folderList = [
 			this.scheduledFolder,
+			this.stockFolder
 			// this.emergencyFolder
 			// this.inventoryFolder,
 			// this.reportFolder,

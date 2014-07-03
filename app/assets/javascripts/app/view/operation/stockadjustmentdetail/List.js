@@ -1,6 +1,6 @@
-Ext.define('AM.view.operation.stockadjustment.List' ,{
+Ext.define('AM.view.operation.stockadjustmentdetail.List' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.stockadjustmentlist',
+  	alias : 'widget.stockadjustmentdetaillist',
 
   	store: 'StockAdjustments', 
  

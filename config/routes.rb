@@ -26,6 +26,9 @@ Ticketie::Application.routes.draw do
     resources :components 
     resources :compatibilities
     
+    resources :stock_adjustments
+    resources :stock_adjustment_details
+    
     
   end
   

@@ -9,7 +9,7 @@ Ext.define('AM.model.StockAdjustment', {
 			{ name: 'is_confirmed', type: 'boolean' },
 			{ name: 'is_deleted', type: 'boolean' },
 			{ name: 'description', type: 'string' }, 
-			{ name: 'adjustment_date', type: 'string' } 
+			{ name: 'adjustment_date', type: 'string' } ,
 			{ name: 'confirmed_at', type: 'string' } 
 			
 			 

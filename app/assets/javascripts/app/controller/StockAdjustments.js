@@ -1,8 +1,8 @@
-Ext.define('AM.controller.StockAdjustment', {
+Ext.define('AM.controller.StockAdjustments', {
   extend: 'Ext.app.Controller',
 
   stores: ['StockAdjustments', 'StockAdjustmentDetails'],
-  models: ['StockAdjustmentDetail'],
+  models: ['StockAdjustmentDetail', 'StockAdjustment'],
 
   views: [
     'operation.stockadjustmentdetail.List',
