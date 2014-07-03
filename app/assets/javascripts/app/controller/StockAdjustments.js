@@ -7,18 +7,19 @@ Ext.define('AM.controller.StockAdjustment', {
   views: [
     'operation.stockadjustmentdetail.List',
     'operation.stockadjustmentdetail.Form',
-		'operation.StockAdjustmentDetail',
-		'operation.StockAdjustmentList'
+		'operation.stockadjustment.List',
+    'operation.stockadjustment.Form', 
+		'operation.StockAdjustment'
   ],
 
   	refs: [
 		{
 			ref : "wrapper",
-			selector : "stockadjustmentdetailProcess"
+			selector : "stockadjustmentProcess"
 		},
 		{
 			ref : 'parentList',
-			selector : 'stockadjustmentdetailProcess operationstockadjustmentList'
+			selector : 'stockadjustmentProcess stockadjustmentlist'
 		},
 		{
 			ref: 'list',
@@ -32,15 +33,36 @@ Ext.define('AM.controller.StockAdjustment', {
 
   init: function() {
     this.control({
-			'stockadjustmentProcess operationstockadjustmentList' : {
+			'stockadjustmentProcess stockadjustmentlist' : {
 				afterrender : this.loadParentObjectList,
 				selectionchange: this.parentSelectionChange,
+				
+				destroy : this.onParentDestroy
 			},
+			
+		 
+			
+			'stockadjustmentform button[action=save]': {
+        click: this.updateParentObject
+      },
+      'stockadjustmentProcess stockadjustmentlist  button[action=addObject]': {
+        click: this.addParentObject
+      },
+      'stockadjustmentProcess stockadjustmentlist  button[action=editObject]': {
+        click: this.editParentObject
+      },
+      'stockadjustmentProcess stockadjustmentlist button[action=deleteObject]': {
+        click: this.deleteParentObject
+      },
+			'stockadjustmentProcess stockadjustmentlist textfield[name=searchField]': {
+        change: this.liveSearch
+      },
+
+
 	
       'stockadjustmentdetaillist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
-				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       'stockadjustmentdetailform button[action=save]': {
@@ -55,9 +77,7 @@ Ext.define('AM.controller.StockAdjustment', {
       'stockadjustmentdetaillist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'stockadjustmentProcess operationstockadjustmentList textfield[name=searchField]': {
-        change: this.liveSearch
-      },
+
 
 			'stockadjustmentdetaillist button[action=deactivateObject]': {
         click: this.deactivateObject
@@ -69,8 +89,8 @@ Ext.define('AM.controller.StockAdjustment', {
 		
     });
   },
-	onDestroy: function(){
-		// console.log("on Destroy the savings_entries list ");
+
+	onParentDestroy: function(){
 		this.getStockAdjustmentDetailsStore().loadData([],false);
 	},
 
@@ -90,11 +110,131 @@ Ext.define('AM.controller.StockAdjustment', {
 	},
 	
 	loadParentObjectList: function(me){
-		console.log("after render from item");
-		// console.log("after render the group_loan list");
 		me.getStore().getProxy().extraParams =  {};
 		me.getStore().load(); 
 	},
+	
+	
+	addParentObject: function() {
+		var view = Ext.widget('stockadjustmentform');
+		view.show(); 
+  },
+
+  editParentObject: function() {
+		var me = this; 
+    var record = this.getParentList().getSelectedObject();
+
+		if( record){
+			var view = Ext.widget('stockadjustmentform');
+			view.setComboBoxData( record );
+	    view.down('form').loadRecord(record);
+		}
+  },
+
+  updateParentObject: function(button) {
+		var me = this; 
+    var win = button.up('window');
+    var form = win.down('form');
+		var parentList = this.getParentList();
+		var wrapper = this.getWrapper();
+
+    var store = this.getStockAdjustmentsStore();
+		var childStore = this.getStockAdjustmentDetailsStore(); 
+    var record = form.getRecord();
+    var values = form.getValues();
+
+// console.log("The values: " ) ;
+// console.log( values );
+
+		
+		if( record ){
+			record.set( values );
+			 
+			form.setLoading(true);
+			record.save({
+				success : function(record){
+					form.setLoading(false);
+					//  since the grid is backed by store, if store changes, it will be updated
+					
+					// store.getProxy().extraParams = {
+					//     livesearch: ''
+					// };
+	 
+					store.load();
+					childStore.load({
+						params: {
+							parent_id : wrapper.selectedParentId 
+						}
+					});
+					
+					 
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+				
+			 
+		}else{
+			//  no record at all  => gonna create the new one 
+			var me  = this; 
+			var newObject = new AM.model.StockAdjustment( values ) ;
+			
+			// learnt from here
+			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
+			// form.mask("Loading....."); 
+			form.setLoading(true);
+			newObject.save({
+				success: function(record){
+
+					
+					store.load();
+					
+					childStore.load({
+						params: {
+							parent_id : wrapper.selectedParentId 
+						}
+					});
+					
+					form.setLoading(false);
+					win.close();
+					
+				},
+				failure: function( record, op){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+		} 
+  },
+
+  deleteParentObject: function() {
+    var record = this.getList().getSelectedObject();
+
+    if (record) {
+      var store = this.getStockAdjustmentsStore();
+      store.remove(record);
+      store.sync();
+// to do refresh programmatically
+			this.getList().query('pagingtoolbar')[0].doRefresh();
+    }
+
+  },
+	
+	
+	
+	/*
+	==============================> Parent 
+	*/
 
   addObject: function() {
 	
