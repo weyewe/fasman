@@ -93,33 +93,57 @@ Ext.define("AM.controller.Operation", {
     ]
 	},
 	
-	emergencyFolder : {
-		text 			: "Setup", 
+	tradingFolder : {
+		text 			: "Trading", 
 		viewClass : '',
 		iconCls		: 'text-folder', 
     expanded	: true,
 		children 	: [
         
 			{ 
-				text:'Ticket', 
-				viewClass:'AM.view.operation.contacts', 
+				text:'PurchaseOrder', 
+				viewClass:'AM.view.operation.purchaseorder', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
 					{
-						controller : 'contacts',
+						controller : 'purchase_orders',
 						action : 'index'
 					}
 				]
 			},
 			{ 
-				text:'Result', 
-				viewClass:'AM.view.operation.Contract', 
+				text:'PurchaseReceival', 
+				viewClass:'AM.view.operation.purchasereceival', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
 					{
-						controller : 'contract_maintenances',
+						controller : 'purchase_receivals',
+						action : 'index'
+					}
+				]
+			},
+			{ 
+				text:'SalesOrder', 
+				viewClass:'AM.view.operation.salesorder', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+					{
+						controller : 'sales_orders',
+						action : 'index'
+					}
+				]
+			},
+			{ 
+				text:'DeliveryOrder', 
+				viewClass:'AM.view.operation.deliveryorder', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+					{
+						controller : 'delivery_orders',
 						action : 'index'
 					}
 				]
@@ -135,7 +159,9 @@ Ext.define("AM.controller.Operation", {
 		
 		me.folderList = [
 			this.scheduledFolder,
-			this.stockFolder
+			this.stockFolder,
+			this.tradingFolder
+			
 			// this.emergencyFolder
 			// this.inventoryFolder,
 			// this.reportFolder,

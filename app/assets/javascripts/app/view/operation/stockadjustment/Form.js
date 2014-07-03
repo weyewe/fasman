@@ -113,8 +113,28 @@ Ext.define('AM.view.operation.stockadjustment.Form', {
     this.callParent(arguments);
   },
 
+	 
+	setSelectedWarehouse: function( warehouse_id ){
+		var comboBox = this.down('form').getForm().findField('warehouse_id'); 
+		var me = this; 
+		var store = comboBox.store;  
+		store.load({
+			params: {
+				selected_id : warehouse_id 
+			},
+			callback : function(records, options, success){
+				me.setLoading(false);
+				comboBox.setValue( warehouse_id );
+			}
+		});
+	},
+
 	setComboBoxData : function( record){
+		var me = this; 
+		me.setLoading(true);
+		
+		me.setSelectedWarehouse( record.get("warehouse_id")  ) ; 
+	},
 	
-	}
 });
 

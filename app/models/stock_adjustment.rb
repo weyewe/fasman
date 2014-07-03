@@ -31,6 +31,10 @@ class StockAdjustment < ActiveRecord::Base
   end
   
   def update_object(params )
+    if self.is_confirmed?
+      self.errors.add(:generic_errors, "Sudah Konfirmasi")
+      return self 
+    end
     self.adjustment_date = params[:adjustment_date]
     self.description = params[:description]
     self.warehouse_id = params[:warehouse_id]
