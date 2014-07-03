@@ -8,9 +8,21 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   validate :quantity_non_negative
   validate :unique_purchase_order_detail
   validate :purchase_order_detail_come_from_the_same_purchase_order
+  validate :can_not_create_if_parent_is_confirmed
+  # validate :can_not_select_unconfirmed_purchase_order_detail
    
   
   after_save :create_warehouse_item_if_not_existed_yet
+  
+  def can_not_create_if_parent_is_confirmed
+    return if not self.purchase_receival_id.present?
+    return if self.persisted?
+    
+    if purchase_receival.is_confirmed?
+      self.errors.add(:generic_errors, "Purchase Order sudah konfirmasi")
+      return self 
+    end
+  end
   
   
   
@@ -136,12 +148,14 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   
   
   def delete_object
-    if not self.is_confirmed?
-      self.destroy 
-    else
+    if  self.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
       return self 
     end
+    
+    
+    
+    self.destroy 
   end
   
   
@@ -262,5 +276,9 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     
     
     
+  end
+  
+  def self.active_objects
+    self
   end
 end

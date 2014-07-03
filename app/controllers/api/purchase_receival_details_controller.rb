@@ -52,13 +52,13 @@ class Api::PurchaseReceivalDetailsController < Api::BaseApiController
                         :purchase_receival_details => [
                             :purchase_receival_id       => @object.purchase_receival_id, 
                             :purchase_order_detail_id   => @object.purchase_order_detail_id, 
-                            :item_id                    => @object.purchase_order.item.id, 
-                            :item_sku                   => @object.purchase_order.item.sku, 
+                            :item_id                    => @object.purchase_order_detail.item.id, 
+                            :item_sku                   => @object.purchase_order_detail.item.sku, 
                             :quantity                   => @object.quantity
                           
                           
                           ] , 
-                        :total => PurchaseReceivalDetail.active_objects.count }  
+                        :total => PurchaseReceivalDetail.where(:purchase_receival_id => @object.purchase_receival_id).active_objects.count }  
     else
       msg = {
         :success => false, 
@@ -81,8 +81,8 @@ class Api::PurchaseReceivalDetailsController < Api::BaseApiController
                         :purchase_receival_details => [
                             :purchase_receival_id       => @object.purchase_receival_id, 
                             :purchase_order_detail_id   => @object.purchase_order_detail_id, 
-                            :item_id                    => @object.purchase_order.item.id, 
-                            :item_sku                   => @object.purchase_order.item.sku, 
+                            :item_id                    => @object.purchase_order_detail.item.id, 
+                            :item_sku                   => @object.purchase_order_detail.item.sku, 
                             :quantity                   => @object.quantity
                           
                           ],

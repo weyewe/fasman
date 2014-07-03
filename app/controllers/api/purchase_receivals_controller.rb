@@ -123,6 +123,7 @@ class Api::PurchaseReceivalsController < Api::BaseApiController
                           :id              =>  @object.id             , 
                           :warehouse_id    =>  @object.warehouse_id   , 
                           :warehouse_name  =>  @object.warehouse.name , 
+                          :purchase_order_id  =>  @object.purchase_order_id , 
                           :is_confirmed    =>  @object.is_confirmed   ,  
                           :is_deleted      =>  @object.is_deleted     , 
                           :description     =>  @object.description    ,       

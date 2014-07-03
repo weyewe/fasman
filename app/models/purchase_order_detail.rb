@@ -96,12 +96,18 @@ class PurchaseOrderDetail < ActiveRecord::Base
   
   
   def delete_object
+    
+    if self.purchase_receival_details.count != 0 
+      self.errors.add(:generic_errors, "Sudah ada penerimaan")
+      return self 
+    end
+    
     if not self.is_confirmed?
-      self.destroy 
-    else
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
       return self 
     end
+    
+    self.destroy 
   end
   
   

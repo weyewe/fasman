@@ -235,7 +235,8 @@ Ext.define('AM.controller.PurchaseOrders', {
   },
 
   deleteParentObject: function() {
-    var record = this.getList().getSelectedObject();
+		
+    var record = this.getParentList().getSelectedObject();
 
     if (record) {
       var store = this.getPurchaseOrdersStore();

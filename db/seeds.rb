@@ -167,8 +167,37 @@ data_entry_role = Role.create!(
         :quantity => 10, 
         :purchase_order_id => po.id 
       )
+      
+       
     end
   end
   
+  PurchaseOrder.first.confirm_object(:confirmed_at => DateTime.now-2.days)
+  PurchaseOrder.last.confirm_object(:confirmed_at => DateTime.now - 1.days)
+  
   puts "Total po detail: #{PurchaseOrderDetail.count}"
+  puts "Total po confirmed: #{PurchaseOrder.where(:is_confirmed => true).count }"
+  
+  PurchaseOrder.where(:is_confirmed => true ).each do |po|
+    PurchaseReceival.create_object(
+      :receival_date             => DateTime.now - 4.days         ,
+      :description      => "description purchase_receival #{po.id}"      ,
+      :purchase_order_id => po.id,
+      :warehouse_id => Warehouse.first.id 
+    )
+  end
+  
+  puts "Total PR: #{PurchaseReceival.count}" 
+  
+  PurchaseReceival.all.each do |pr|
+    pr.purchase_order.purchase_order_details.each do |pod|
+      PurchaseReceivalDetail.create_object(
+        :purchase_order_detail_id => pod.id ,
+        :quantity => pod.quantity - 1 , 
+        :purchase_receival_id => pr.id 
+      )
+    end
+  end
+  
+  puts "Total pr detail: #{PurchaseReceivalDetail.count}"
   

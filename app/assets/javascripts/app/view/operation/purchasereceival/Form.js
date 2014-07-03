@@ -115,12 +115,12 @@ Ext.define('AM.view.operation.purchasereceival.Form', {
 				},
 				
 				{
-					fieldLabel: 'Warehouse',
+					fieldLabel: 'PurchaseOrder',
 					xtype: 'combo',
 					queryMode: 'remote',
 					forceSelection: true, 
-					displayField : 'warehouse_name',
-					valueField : 'warehouse_id',
+					displayField : 'purchase_order_id',
+					valueField : 'purchase_order_id',
 					pageSize : 5,
 					minChars : 1, 
 					allowBlank : false, 
@@ -130,7 +130,7 @@ Ext.define('AM.view.operation.purchasereceival.Form', {
 						getInnerTpl: function(){
 							return  	'<div data-qtip="{purchase_order_id}">' + 
 													'<div class="combo-name">{purchase_order_id}</div>' +   
-													'<div>{purchase_order_id_description}</div>' + 
+													'<div>{purchase_order_description}</div>' + 
 							 					'</div>';
 						}
 					},

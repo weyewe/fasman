@@ -15,6 +15,7 @@ Ticketie::Application.routes.draw do
     get 'search_warehouse' => 'warehouses#search', :as => :search_warehouse, :method => :get
     get 'search_contact' => 'contacts#search', :as => :search_contact, :method => :get
     get 'search_purchase_order' => 'purchase_orders#search', :as => :search_purchase_order, :method => :get
+    get 'search_purchase_order_detail' => 'purchase_order_details#search', :as => :search_purchase_order_detail, :method => :get
     
     # master data 
     resources :app_users

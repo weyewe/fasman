@@ -159,16 +159,14 @@ class Api::PurchaseOrdersController < Api::BaseApiController
     
     if  selected_id.nil?
       @objects = PurchaseOrder.active_objects.where{ 
-        (description =~ query)   | 
-        (id =~ query )
+        (description =~ query)   
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
       @total = PurchaseOrder.active_objects.where{
-          (description =~ query)   | 
-          (id =~ query )
+          (description =~ query)    
                               }.count
     else
       @objects = PurchaseOrder.active_objects.where{ (id.eq selected_id)  

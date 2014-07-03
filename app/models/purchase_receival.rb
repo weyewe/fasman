@@ -1,11 +1,13 @@
 class PurchaseReceival < ActiveRecord::Base
   belongs_to :purchase_order
+  belongs_to :warehouse
   has_many :purchase_receival_details 
   
   
   validates_presence_of :receival_date, :purchase_order_id , :warehouse_id 
   
   validate :valid_purchase_order_id, :valid_warehouse_id
+  validate :confirmed_purchase_order
   
   def valid_purchase_order_id
     return  if not purchase_order_id.present? 
@@ -13,6 +15,7 @@ class PurchaseReceival < ActiveRecord::Base
     
     if object.nil?
       self.errors.add(:purchase_order_id, "Harus ada dan valid")
+      return self 
     end
   end
   
@@ -22,6 +25,16 @@ class PurchaseReceival < ActiveRecord::Base
     
     if object.nil?
       self.errors.add(:warehouse_id, "Harus ada dan valid")
+    end
+  end
+  
+  def confirmed_purchase_order
+    return if not purchase_order_id.present? 
+    return if  purchase_order.nil?
+    
+    if not purchase_order.is_confirmed?
+      self.errors.add(:generic_errors, "Purchase Order harus sudah di konfirmasi")
+      return self 
     end
   end
   

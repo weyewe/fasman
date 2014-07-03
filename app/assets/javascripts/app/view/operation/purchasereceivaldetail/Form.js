@@ -12,20 +12,25 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 	
   initComponent: function() {
 	
-		var remoteJsonStoreItem = Ext.create(Ext.data.JsonStore, {
-			storeId : 'warehouse_search',
+		var remoteJsonStorePurchaseOrderDetail = Ext.create(Ext.data.JsonStore, {
+			storeId : 'pod_search',
 			fields	: [
 			 		{
 						name : 'item_sku',
-						mapping : "sku"
+						mapping : "item_sku"
 					} ,
 					{
 						name : 'item_description',
-						mapping : "description"
+						mapping : "item_description"
 					} ,
 					
 					{
-						name : 'item_id',
+						name : 'purchase_order_id',
+						mapping : "purchase_order_id"
+					} ,
+					
+					{
+						name : 'purchase_order_detail_id',
 						mapping : "id"
 					}  
 			],
@@ -36,7 +41,7 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 					parent_id : null
 				},
 				type : 'ajax',
-				url : 'api/search_item',
+				url : 'api/search_purchase_order_detail',
 				reader : {
 					type : 'json',
 					root : 'records', 
@@ -65,8 +70,8 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 	      },
 				{
 	        xtype: 'hidden',
-	        name : 'stock_adjustment_id',
-	        fieldLabel: 'stock adjustment id '
+	        name : 'purchase_receival_id',
+	        fieldLabel: 'purchase receival id  '
 	      },
 				{
 					fieldLabel: 'Item',
@@ -74,21 +79,22 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 					queryMode: 'remote',
 					forceSelection: true, 
 					displayField : 'item_sku',
-					valueField : 'item_id',
+					valueField : 'purchase_order_detail_id',
 					pageSize : 5,
 					minChars : 1, 
 					allowBlank : false, 
 					triggerAction: 'all',
-					store : remoteJsonStoreItem , 
+					store : remoteJsonStorePurchaseOrderDetail , 
 					listConfig : {
 						getInnerTpl: function(){
 							return  	'<div data-qtip="{item_sku}">' + 
 													'<div class="combo-name">{item_sku}</div>' +   
 													'<div>{item_description}</div>' + 
+													'<div>PO ID: {purchase_order_id}</div>' + 
 							 					'</div>';
 						}
 					},
-					name : 'item_id' 
+					name : 'purchase_order_detail_id' 
 				},
 				
 				{
@@ -118,7 +124,7 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
   },
 
 	setSelectedItem: function( item_id ){
-		var comboBox = this.down('form').getForm().findField('item_id'); 
+		var comboBox = this.down('form').getForm().findField('purchase_order_detail_id'); 
 		var me = this; 
 		var store = comboBox.store;  
 		store.load({
@@ -133,14 +139,30 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 	},
 
 	setComboBoxData : function( record){
+		
 		var me = this; 
 		me.setLoading(true);
 		
 		me.setSelectedItem( record.get("item_id")  ) ; 
 	},
 	
+	setExtraParamInPurchaseOrderDetailComboBox: function(parent_id){
+		
+		var comboBox = this.down('form').getForm().findField('purchase_order_detail_id'); 
+		var store = comboBox.store;
+		
+		store.getProxy().extraParams.parent_id =  parent_id;
+	},
+	
+	setExtraParamForJsonRemoteStore: function( parent_id ) {
+		console.log("Inside setExtraParamForJsonRemoteStore ");
+		var me =this;
+		me.setExtraParamInPurchaseOrderDetailComboBox( parent_id );
+	},
+	
+	
 	setParentData: function( record ){
-		this.down('form').getForm().findField('stock_adjustment_id').setValue(record.get('id')); 
+		this.down('form').getForm().findField('purchase_receival_id').setValue(record.get('id')); 
 	},
 });
 

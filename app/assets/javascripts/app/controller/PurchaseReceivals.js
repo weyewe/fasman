@@ -235,7 +235,8 @@ Ext.define('AM.controller.PurchaseReceivals', {
   },
 
   deleteParentObject: function() {
-    var record = this.getList().getSelectedObject();
+		
+    var record = this.getParentList().getSelectedObject();
 
     if (record) {
       var store = this.getPurchaseReceivalsStore();
@@ -261,19 +262,23 @@ Ext.define('AM.controller.PurchaseReceivals', {
 			var view = Ext.widget('purchasereceivaldetailform');
 			view.show();
 			view.setParentData(parentObject);
+			view.setExtraParamForJsonRemoteStore( parentObject.get("purchase_order_id"));
 		}
   },
 
   editObject: function() {
 		var me = this; 
     var record = this.getList().getSelectedObject();
-    var view = Ext.widget('purchasereceivaldetailform');
 
-		view.setComboBoxData( record );
-
-		
-
-    view.down('form').loadRecord(record);
+		var parentObject  = this.getParentList().getSelectedObject();
+		if( parentObject) {
+			var view = Ext.widget('purchasereceivaldetailform');
+			view.show();
+			view.setParentData(parentObject);
+			view.setExtraParamForJsonRemoteStore( parentObject.get("purchase_order_id"));
+			view.setComboBoxData( record );
+			view.down('form').loadRecord(record);
+		}
   },
 
   updateObject: function(button) {

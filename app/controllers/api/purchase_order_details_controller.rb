@@ -101,43 +101,67 @@ class Api::PurchaseOrderDetailsController < Api::BaseApiController
     end
   end
   
-  # def search
-  #   search_params = params[:query]
-  #   selected_id = params[:selected_id]
-  #   if params[:selected_id].nil?  or params[:selected_id].length == 0 
-  #     selected_id = nil
-  #   end
-  #   
-  #   query = "%#{search_params}%"
-  #   # on PostGre SQL, it is ignoring lower case or upper case 
-  #   
-  #   if  selected_id.nil?
-  #     @objects = PurchaseOrderDetail.joins(:purchase_order_detail_type).where{ 
-  #                           (purchase_order_detail_type.name =~ query)   | 
-  #                           (code =~ query)  | 
-  #                           (description =~ query)
-  #                             }.
-  #                       page(params[:page]).
-  #                       per(params[:limit]).
-  #                       order("id DESC")
-  #                       
-  #     @total = PurchaseOrderDetail.joins(:purchase_order_detail_type).where{ 
-  #             (purchase_order_detail_type.name =~ query)   | 
-  #             (code =~ query)  | 
-  #             (description =~ query)
-  #                             }.count
-  #   else
-  #     @objects = PurchaseOrderDetail.where{ (id.eq selected_id)  
-  #                             }.
-  #                       page(params[:page]).
-  #                       per(params[:limit]).
-  #                       order("id DESC")
-  #  
-  #     @total = PurchaseOrderDetail.where{ (id.eq selected_id)   
-  #                             }.count 
-  #   end
-  #   
-  #   
-  #   # render :json => { :records => @objects , :total => @total, :success => true }
-  # end
+  def search
+    search_params = params[:query]
+    selected_id = params[:selected_id]
+    if params[:selected_id].nil?  or params[:selected_id].length == 0 
+      selected_id = nil
+    end
+    
+    query = "%#{search_params}%"
+    # on PostGre SQL, it is ignoring lower case or upper case 
+    selected_parent_id = params[:parent_id]
+    
+    if  selected_id.nil?
+      if params[:parent_id].nil?
+        @objects = PurchaseOrderDetail.joins(:item).where{ 
+                              (item.sku =~ query)   |  
+                              (item.description =~ query)
+                                }.
+                          page(params[:page]).
+                          per(params[:limit]).
+                          order("id DESC")
+
+        @total = PurchaseOrderDetail.joins(:item).where{ 
+                              (item.sku =~ query)   |  
+                              (item.description =~ query)
+                                }.count
+      else
+        @objects = PurchaseOrderDetail.joins(:item).where{ 
+                              ( purchase_order_id.eq selected_parent_id) & 
+                              (
+                                (item.sku =~ query)   |  
+                                (item.description =~ query)
+                              )
+          
+                              
+                      }.
+                          page(params[:page]).
+                          per(params[:limit]).
+                          order("id DESC")
+
+        @total = PurchaseOrderDetail.joins(:item).where{ 
+                        ( purchase_order_id.eq selected_parent_id) & 
+                        (
+                          (item.sku =~ query)   |  
+                          (item.description =~ query)
+                        )
+              }.count
+      end
+      
+      
+    else
+      @objects = PurchaseOrderDetail.where{ (id.eq selected_id)  
+                              }.
+                        page(params[:page]).
+                        per(params[:limit]).
+                        order("id DESC")
+   
+      @total = PurchaseOrderDetail.where{ (id.eq selected_id)   
+                              }.count 
+    end
+    
+    
+    # render :json => { :records => @objects , :total => @total, :success => true }
+  end
 end

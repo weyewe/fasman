@@ -101,6 +101,11 @@ class PurchaseOrder < ActiveRecord::Base
   def unconfirm_object 
     return if self.is_deleted?
     
+    if self.purchase_receivals.where(:is_deleted => false).count != 0
+      self.errors.add(:generic_errors, "Sudah ada penerimaan")
+      return self 
+    end
+    
     if not self.is_confirmed? 
       self.errors.add(:generic_errors, "Belum konfirmasi")
       return self 
