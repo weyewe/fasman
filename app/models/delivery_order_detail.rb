@@ -9,6 +9,17 @@ class DeliveryOrderDetail < ActiveRecord::Base
   validate :unique_sales_order_detail
   validate :sales_order_detail_come_from_the_same_sales_order
   validate :enough_ready_item_in_warehouse
+  validate :can_not_create_if_parent_is_confirmed
+  
+  def can_not_create_if_parent_is_confirmed
+    return if not self.delivery_order_id.present?
+    return if self.persisted?
+    
+    if delivery_order.is_confirmed?
+      self.errors.add(:generic_errors, "Delivery Order sudah konfirmasi")
+      return self 
+    end
+  end
   
   
   
@@ -129,12 +140,13 @@ class DeliveryOrderDetail < ActiveRecord::Base
   
   
   def delete_object
-    if not self.is_confirmed?
-      self.destroy 
-    else
+    
+    if self.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
       return self 
     end
+    
+    self.destroy 
   end
   
   
@@ -250,5 +262,9 @@ class DeliveryOrderDetail < ActiveRecord::Base
     
     
     
+  end
+  
+  def self.active_objects
+    self
   end
 end
