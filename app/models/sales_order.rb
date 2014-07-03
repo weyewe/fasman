@@ -1,6 +1,7 @@
 class SalesOrder < ActiveRecord::Base
   has_many :sales_receivals 
   has_many :sales_order_details 
+  belongs_to :contact
   
   validates_presence_of :contact_id, :sales_date 
   

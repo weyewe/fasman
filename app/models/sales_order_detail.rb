@@ -7,6 +7,17 @@ class SalesOrderDetail < ActiveRecord::Base
   
   validate :non_zero_quantity
   validate :unique_ordered_item 
+  validate :can_not_create_if_parent_is_confirmed
+  
+  def can_not_create_if_parent_is_confirmed
+    return if not self.sales_order_id.present?
+    return if self.persisted?
+    
+    if sales_order.is_confirmed?
+      self.errors.add(:generic_errors, "Sales Order sudah konfirmasi")
+      return self 
+    end
+  end
   
   def non_zero_quantity
     return if not quantity.present? 
@@ -149,5 +160,9 @@ class SalesOrderDetail < ActiveRecord::Base
   def execute_delivery(do_detail_quantity)
     self.pending_delivery -= do_detail_quantity 
     self.save
+  end
+  
+  def self.active_objects
+    self
   end
 end

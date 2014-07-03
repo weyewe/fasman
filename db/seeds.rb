@@ -201,3 +201,74 @@ data_entry_role = Role.create!(
   
   puts "Total pr detail: #{PurchaseReceivalDetail.count}"
   
+  
+  
+######### for the sales part
+
+(1..3).each do |x|
+  SalesOrder.create_object(
+    :sales_date             => DateTime.now - 6.days         ,
+    :description      => "description stock adjustment #{x}"      ,
+    :contact_id => Contact.first.id 
+  )
+end
+
+puts "Total SO: #{SalesOrder.count}" 
+
+item_array  = Item.all 
+SalesOrder.all.each do |po|
+  (1..3).each do |x|
+    SalesOrderDetail.create_object(
+      :item_id => item_array[x-1].id,
+      :quantity => 10, 
+      :sales_order_id => po.id 
+    )
+    
+     
+  end
+end
+
+SalesOrder.first.confirm_object(:confirmed_at => DateTime.now-2.days)
+SalesOrder.last.confirm_object(:confirmed_at => DateTime.now - 1.days)
+
+puts "Total so detail: #{SalesOrderDetail.count}"
+puts "Total so confirmed: #{SalesOrder.where(:is_confirmed => true).count }"
+
+stock_adjustment = StockAdjustment.create_object(
+  :adjustment_date  => DateTime.now , 
+  :description      => "awesome adjustment ",
+  :warehouse_id => Warehouse.first.id 
+)
+
+item_array.each do |item|
+  StockAdjustmentDetail.create_object(
+    :stock_adjustment_id => stock_adjustment.id , 
+    :quantity => 50, 
+    :item_id => item.id 
+  )
+end
+
+stock_adjustment.confirm_object(:confirmed_at => DateTime.now )
+
+SalesOrder.where(:is_confirmed => true ).each do |po|
+  DeliveryOrder.create_object(
+    :delivery_date             => DateTime.now - 4.days         ,
+    :description      => "description sales_delivery #{po.id}"      ,
+    :sales_order_id => po.id,
+    :warehouse_id => Warehouse.first.id 
+  )
+end
+
+puts "Total DO: #{DeliveryOrder.count}" 
+
+DeliveryOrder.all.each do |d_o|
+  d_o.sales_order.sales_order_details.each do |sod|
+    DeliveryOrderDetail.create_object(
+      :sales_order_detail_id => sod.id ,
+      :quantity => sod.quantity - 1 , 
+      :delivery_order_id => d_o.id 
+    )
+  end
+end
+
+puts "Total d_o detail: #{DeliveryOrderDetail.count}"

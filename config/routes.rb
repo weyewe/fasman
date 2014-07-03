@@ -39,6 +39,9 @@ Ticketie::Application.routes.draw do
     resources :purchase_receivals
     resources :purchase_receival_details 
     
+    resources :sales_orders
+    resources :sales_order_details 
+    
     
   end
   
