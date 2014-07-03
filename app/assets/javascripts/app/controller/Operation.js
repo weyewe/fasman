@@ -102,7 +102,7 @@ Ext.define("AM.controller.Operation", {
         
 			{ 
 				text:'PurchaseOrder', 
-				viewClass:'AM.view.operation.purchaseorder', 
+				viewClass:'AM.view.operation.PurchaseOrder', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
@@ -114,7 +114,7 @@ Ext.define("AM.controller.Operation", {
 			},
 			{ 
 				text:'PurchaseReceival', 
-				viewClass:'AM.view.operation.purchasereceival', 
+				viewClass:'AM.view.operation.PurchaseReceival', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
@@ -126,7 +126,7 @@ Ext.define("AM.controller.Operation", {
 			},
 			{ 
 				text:'SalesOrder', 
-				viewClass:'AM.view.operation.salesorder', 
+				viewClass:'AM.view.operation.SalesOrder', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [
@@ -138,7 +138,7 @@ Ext.define("AM.controller.Operation", {
 			},
 			{ 
 				text:'DeliveryOrder', 
-				viewClass:'AM.view.operation.deliveryorder', 
+				viewClass:'AM.view.operation.DeliveryOrder', 
 				leaf:true, 
 				iconCls:'text',
 				conditions : [

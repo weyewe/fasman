@@ -10,6 +10,19 @@ class StockAdjustmentDetail < ActiveRecord::Base
   
   validate :valid_item_id
   validate :unique_item_in_stock_adjustment_detail
+  validate :can_not_create_if_parent_is_confirmed
+  
+  
+  def can_not_create_if_parent_is_confirmed
+    return if not self.stock_adjustment_id.present?
+    return if self.persisted?
+    
+    if stock_adjustment.is_confirmed?
+      self.errors.add(:generic_errors, "Stock Adjustment sudah konfirmasi")
+      return self 
+    end
+  end
+  
   
   
   def valid_item_id
@@ -115,12 +128,6 @@ class StockAdjustmentDetail < ActiveRecord::Base
     new_object.item_id = params[:item_id]
     new_object.quantity = params[:quantity]
     
-    if new_object.stock_adjustment_id.present?
-      if new_object.stock_adjustment.is_confirmed?
-        new_object.errors.add(:generic_errors, "Sudah konfirmasi")
-        return new_object 
-      end
-    end
     
     new_object.save 
     

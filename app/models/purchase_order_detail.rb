@@ -7,6 +7,9 @@ class PurchaseOrderDetail < ActiveRecord::Base
   
   validate :non_zero_quantity
   validate :unique_ordered_item 
+  validate :can_not_create_if_parent_is_confirmed
+  
+  
   
   def non_zero_quantity
     return if not quantity.present? 
@@ -17,26 +20,7 @@ class PurchaseOrderDetail < ActiveRecord::Base
     end
   end
   
-  # def non_negative_unit_price
-  #   return if not unit_price.present? 
-  #   
-  #   if unit_price < BigDecimal("0")
-  #     self.errors.add(:unit_price, "Harga tidak boleh negative")
-  #     return self 
-  #   end
-  # end
-  # 
-  # def discount_within_limit
-  #   return if not discount.present?
-  #   lower_limit = BigDecimal("0")
-  #   upper_limit = BigDecimal("100")
-  #   
-  #   if not ( discount >= lower_limit and discount <= upper_limit )
-  #     self.errors.add(:discount, "Harus di antara 0 dan 100")
-  #     return self 
-  #   end
-  # end
-  
+   
   def unique_ordered_item
     return if not item_id.present? 
     
@@ -62,6 +46,16 @@ class PurchaseOrderDetail < ActiveRecord::Base
     end
   end
   
+  def can_not_create_if_parent_is_confirmed
+    return if not self.purchase_order_id.present?
+    return if self.persisted?
+    
+    if purchase_order.is_confirmed?
+      self.errors.add(:generic_errors, "Purchase Order sudah konfirmasi")
+      return self 
+    end
+  end
+  
   def self.create_object( params ) 
     new_object = self.new
     new_object.purchase_order_id = params[:purchase_order_id ]
@@ -69,6 +63,9 @@ class PurchaseOrderDetail < ActiveRecord::Base
     new_object.quantity = params[:quantity]
     new_object.discount = params[:discount]
     new_object.unit_price = params[:unit_price]
+    
+    
+  
     if new_object.save 
       new_object.pending_receival = new_object.quantity
       new_object.save
@@ -171,5 +168,9 @@ class PurchaseOrderDetail < ActiveRecord::Base
   def execute_receival(pr_detail_quantity)
     self.pending_receival -= pr_detail_quantity 
     self.save
+  end
+  
+  def self.active_objects
+    self 
   end
 end

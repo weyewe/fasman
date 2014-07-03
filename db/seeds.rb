@@ -149,3 +149,26 @@ data_entry_role = Role.create!(
   
   puts "Total stock adjustment detail: #{StockAdjustmentDetail.count}"
   
+  (1..3).each do |x|
+    PurchaseOrder.create_object(
+      :purchase_date             => DateTime.now - 6.days         ,
+      :description      => "description stock adjustment #{x}"      ,
+      :contact_id => Contact.first.id 
+    )
+  end
+  
+  puts "Total PO: #{PurchaseOrder.count}" 
+  
+  item_array  = Item.all 
+  PurchaseOrder.all.each do |po|
+    (1..3).each do |x|
+      PurchaseOrderDetail.create_object(
+        :item_id => item_array[x-1].id,
+        :quantity => 10, 
+        :purchase_order_id => po.id 
+      )
+    end
+  end
+  
+  puts "Total po detail: #{PurchaseOrderDetail.count}"
+  

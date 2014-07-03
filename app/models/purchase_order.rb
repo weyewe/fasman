@@ -1,6 +1,7 @@
 class PurchaseOrder < ActiveRecord::Base
   has_many :purchase_receivals 
   has_many :purchase_order_details 
+  belongs_to :contact
   
   validates_presence_of :contact_id, :purchase_date 
   
