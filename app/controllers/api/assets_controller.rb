@@ -112,7 +112,7 @@ class Api::AssetsController < Api::BaseApiController
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = Asset.joins(:asset_type).where{ 
+      @total = Asset.joins(:machine, :contact).where{ 
               (machine.name =~ query)   | 
               (code =~ query)  | 
               (contact.name =~ query)

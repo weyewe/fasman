@@ -11,20 +11,14 @@ Ext.define('AM.view.operation.Maintenance', {
 		selectedParentId : null,
 		
 		items : [
-		// list of group loan.. just the list.. no CRUD etc
 			{
-					xtype : 'mastercustomerList',
-					flex : 1
+					xtype : 'maintenancelist',
+					flex : 2
 				},
 				
 				{
-					xtype : 'maintenancelist',
-					flex : 5
+					xtype : 'maintenancedetaillist',
+					flex : 2
 				}, 
-			
-			// {
-			// 	xtype: "container",
-			// 	html : "Aweomse banzai"
-			// }
 		]
 });

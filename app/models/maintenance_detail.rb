@@ -7,6 +7,18 @@ class MaintenanceDetail < ActiveRecord::Base
   belongs_to :component  
   
   validate :maintenance_is_not_confirmed_upon_save
+  validate :can_not_create_if_parent_is_confirmed
+  
+  def can_not_create_if_parent_is_confirmed
+    return if not self.maintenance_id.present?
+    return if self.persisted?
+    
+    if maintenance.is_confirmed?
+      self.errors.add(:generic_errors, "Purchase Order sudah konfirmasi")
+      return self 
+    end
+  end
+  
   
   def maintenance_is_not_confirmed_upon_save
     return if maintenance_id.nil?
@@ -115,20 +127,12 @@ class MaintenanceDetail < ActiveRecord::Base
   end
   
   def delete_object
-    if self.is_confirmed?
+    if self.maintenance.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi")
       return self
     end
     
-    if self.is_deleted?
-      self.errors.add(:generic_errors, "Sudah delete")
-      return self 
-    end
-    
-    if self.components.count != 0 
-      self.errors.add(:generic_errors, "Sudah ada komponen")
-      return self 
-    end
+     
     
     self.destroy
   end 
@@ -191,6 +195,6 @@ class MaintenanceDetail < ActiveRecord::Base
   
   
   def self.active_objects
-    self.where(:is_deleted => false )
+    self
   end
 end

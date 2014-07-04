@@ -2,6 +2,7 @@
 class Maintenance < ActiveRecord::Base
   validates_presence_of :asset_id 
   validates_presence_of :complaint_date , :warehouse_id
+  belongs_to :warehouse
   
   belongs_to :asset 
   has_many :maintenance_details 
@@ -50,7 +51,7 @@ class Maintenance < ActiveRecord::Base
 
      
     if new_object.save
-      new_object.code  = ""
+      new_object.code  = new_object.id 
       new_object.save 
       
       new_object.asset.asset_details.each do |asset_detail|
@@ -68,6 +69,15 @@ class Maintenance < ActiveRecord::Base
    
   
   def update_object(params)
+    
+    if self.is_confirmed?
+      self.errors.add(:generic_errors, "Sudah konfirmasi")
+      return self 
+    end
+    
+    if asset_id != params[:asset_id]
+      self.errors.add(:generic_errors, "Tidak boleh mengganti asset. Silakan delete")
+    end
     
     self.complaint_date = params[:complaint_date] 
     self.complaint      = params[:complaint]
@@ -90,9 +100,9 @@ class Maintenance < ActiveRecord::Base
       return self 
     end
     
-    if self.components.count != 0 
-      self.errors.add(:generic_errors, "Sudah ada komponen")
-      return self 
+    
+    self.maintenance_details.each do |maintenance_detail|
+      maintenance_detail.destroy 
     end
     
     
@@ -113,9 +123,18 @@ class Maintenance < ActiveRecord::Base
     end
     
     
-    if self.maintenance_details.count != 0 
+    if self.maintenance_details.count == 0 
       self.errors.add(:generic_errors, "Tidak ada maintenance detail")
       return self 
+    end
+    
+    if maintenance_details.where{
+      (diagnosis_case.eq nil) | 
+      (solution_case.eq nil) 
+      
+    }.count != 0 
+      self.errors.add(:generic_errors, "Maintenance Detail harus di update")
+      return self
     end
     
     replacement_required_maintenance_details = self.maintenance_details.where(:is_replacement_required => true )

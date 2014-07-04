@@ -1,14 +1,15 @@
 Ext.define('AM.controller.Maintenances', {
   extend: 'Ext.app.Controller',
 
-  stores: ['Customers', 'Maintenances'],
-  models: ['Maintenance'],
+  stores: ['Maintenances', 'MaintenanceDetails'],
+  models: ['MaintenanceDetail', 'Maintenance'],
 
   views: [
-    'operation.maintenance.List',
-    'operation.maintenance.Form',
-		'operation.Maintenance',
-		'master.CustomerList'
+    'operation.maintenancedetail.List',
+    'operation.maintenancedetail.Form',
+		'operation.maintenance.List',
+    'operation.maintenance.Form', 
+		'operation.Maintenance'
   ],
 
   	refs: [
@@ -18,79 +19,107 @@ Ext.define('AM.controller.Maintenances', {
 		},
 		{
 			ref : 'parentList',
-			selector : 'maintenanceProcess mastercustomerList'
+			selector : 'maintenanceProcess maintenancelist'
 		},
 		{
 			ref: 'list',
-			selector: 'maintenancelist'
+			selector: 'maintenanceProcess maintenancedetaillist'
 		},
 		{
 			ref : 'searchField',
-			selector: 'maintenancelist textfield[name=searchField]'
+			selector: 'maintenancedetaillist textfield[name=searchField]'
 		}
 	],
 
   init: function() {
-		// console.log("In the init function of maintenacnes controller");
+	
     this.control({
-			'maintenanceProcess mastercustomerList' : {
+			'maintenanceProcess maintenancelist' : {
 				afterrender : this.loadParentObjectList,
 				selectionchange: this.parentSelectionChange,
+				
+				destroy : this.onParentDestroy 
 			},
-	
-      'maintenancelist': {
-        itemdblclick: this.editObject,
-        selectionchange: this.selectionChange,
-				destroy : this.onDestroy
-				// afterrender : this.loadObjectList,
+			
+		 
+			
+			'maintenanceform button[action=save]': {
+        click: this.updateParentObject
       },
-      'maintenanceform button[action=save]': {
-        click: this.updateObject
+      'maintenanceProcess maintenancelist  button[action=addObject]': {
+        click: this.addParentObject
       },
-      'maintenancelist button[action=addObject]': {
-        click: this.addObject
+      'maintenanceProcess maintenancelist  button[action=editObject]': {
+        click: this.editParentObject
       },
-      'maintenancelist button[action=editObject]': {
-        click: this.editObject
+      'maintenanceProcess maintenancelist button[action=deleteObject]': {
+        click: this.deleteParentObject
       },
-      'maintenancelist button[action=deleteObject]': {
-        click: this.deleteObject
-      },
-			'maintenanceProcess mastercustomerList textfield[name=searchField]': {
+
+			'maintenanceProcess maintenancelist button[action=confirmObject]': {
+        click: this.confirmObject
+			}	,
+			
+			'confirmmaintenanceform button[action=confirm]' : {
+				click : this.executeConfirm
+			},
+			
+			'maintenanceProcess maintenancedetaillist button[action=updateResultObject]': {
+        click: this.updateResultObject
+			}	,
+			
+			'updatemaintenanceresultform button[action=save]' : {
+				click : this.executeUpdateResult
+			},
+			
+			'maintenanceProcess maintenancelist textfield[name=searchField]': {
         change: this.liveSearch
       },
 
-			'maintenancelist button[action=diagnoseObject]': {
-        click: this.diagnoseObject
-			}	,
-			
-			'diagnosemaintenanceform button[action=confirmDiagnose]' : {
-				click : this.executeDiagnose
-			},
-			
-			'maintenancelist button[action=solveObject]': {
-        click: this.solveObject
-			}	,
-			
-			'solvemaintenanceform button[action=confirmSolve]' : {
-				click : this.executeSolve
-			},
 
+	
+      'maintenancedetaillist': {
+        itemdblclick: this.editObject,
+        selectionchange: this.selectionChange,
+				// afterrender : this.loadObjectList,
+      },
+      'maintenancedetailform button[action=save]': {
+        click: this.updateObject
+      },
+      'maintenancedetaillist button[action=addObject]': {
+        click: this.addObject
+      },
+      'maintenancedetaillist button[action=editObject]': {
+        click: this.editObject
+      },
+      'maintenancedetaillist button[action=deleteObject]': {
+        click: this.deleteObject
+      },
+
+
+			'maintenancedetaillist button[action=deactivateObject]': {
+        click: this.deactivateObject
+			}	,
+			
+			'deactivatemaintenancedetailform button[action=confirmDeactivate]' : {
+				click : this.executeDeactivate
+			},
+		
     });
   },
-	onDestroy: function(){
-		// console.log("on Destroy the savings_entries list ");
-		this.getMaintenancesStore().loadData([],false);
+ 
+	onParentDestroy: function(){
+		this.getMaintenanceDetailsStore().loadData([],false);
 	},
 
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getCustomersStore().getProxy().extraParams = {
+		me.getMaintenancesStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getCustomersStore().load();
+		me.getMaintenancesStore().load();
 	},
  
 
@@ -99,43 +128,155 @@ Ext.define('AM.controller.Maintenances', {
 	},
 	
 	loadParentObjectList: function(me){
-		// console.log("after render from item in Maintenances");
-		// console.log("after render the group_loan list in Maintenances");
-		 
-		
-		this.getMaintenancesStore().loadData([],false);
-		
+		// console.log("Gonna load parent object");
 		me.getStore().getProxy().extraParams =  {};
-		me.getStore().load();
-		
-		this.getList().disableAddButton();
+		me.getStore().load(); 
 	},
+	
+	
+	addParentObject: function() {
+		var view = Ext.widget('maintenanceform');
+		view.show(); 
+  },
+
+  editParentObject: function() {
+		var me = this; 
+    var record = this.getParentList().getSelectedObject();
+
+		if( record){
+			var view = Ext.widget('maintenanceform');
+			view.setComboBoxData( record );
+	    view.down('form').loadRecord(record);
+		}
+  },
+
+  updateParentObject: function(button) {
+		var me = this; 
+    var win = button.up('window');
+    var form = win.down('form');
+		var parentList = this.getParentList();
+		var wrapper = this.getWrapper();
+
+    var store = this.getMaintenancesStore();
+		var childStore = this.getMaintenanceDetailsStore(); 
+    var record = form.getRecord();
+    var values = form.getValues();
+
+// console.log("The values: " ) ;
+// console.log( values );
+
+		
+		if( record ){
+			record.set( values );
+			 
+			form.setLoading(true);
+			record.save({
+				success : function(record){
+					form.setLoading(false);
+					//  since the grid is backed by store, if store changes, it will be updated
+					
+					// store.getProxy().extraParams = {
+					//     livesearch: ''
+					// };
+	 
+					store.load();
+					childStore.load({
+						params: {
+							parent_id : wrapper.selectedParentId 
+						}
+					});
+					
+					 
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+				
+			 
+		}else{
+			//  no record at all  => gonna create the new one 
+			var me  = this; 
+			var newObject = new AM.model.Maintenance( values ) ;
+			
+			// learnt from here
+			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
+			// form.mask("Loading....."); 
+			form.setLoading(true);
+			newObject.save({
+				success: function(record){
+
+					
+					store.load();
+					
+					childStore.load({
+						params: {
+							parent_id : wrapper.selectedParentId 
+						}
+					});
+					
+					form.setLoading(false);
+					win.close();
+					
+				},
+				failure: function( record, op){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+		} 
+  },
+
+  deleteParentObject: function() {
+		
+    var record = this.getParentList().getSelectedObject();
+
+    if (record) {
+      var store = this.getMaintenancesStore();
+      store.remove(record);
+      store.sync();
+// to do refresh programmatically
+			this.getList().query('pagingtoolbar')[0].doRefresh();
+    }
+
+  },
+	
+	
+	
+	/*
+	==============================> Parent 
+	*/
 
   addObject: function() {
+	
     
 		var parentObject  = this.getParentList().getSelectedObject();
-		
 		if( parentObject) {
-			var view = Ext.widget('maintenanceform');
-			view.setParentData( parentObject) ;
+			var view = Ext.widget('maintenancedetailform');
 			view.show();
-			// view.setParentData(parentObject);
+			view.setParentData(parentObject);
 		}
   },
 
   editObject: function() {
 		var me = this; 
     var record = this.getList().getSelectedObject();
+    var view = Ext.widget('maintenancedetailform');
 
-		if( record){
-			var parentObject  = this.getParentList().getSelectedObject();
-	    var view = Ext.widget('maintenanceform');
-			view.setParentData( parentObject) ;
-			view.setComboBoxData( record );
-			view.down('form').loadRecord(record);
-			
-		}
-    
+		view.setComboBoxData( record );
+
+		
+
+    view.down('form').loadRecord(record);
   },
 
   updateObject: function(button) {
@@ -145,7 +286,7 @@ Ext.define('AM.controller.Maintenances', {
 		var parentList = this.getParentList();
 		var wrapper = this.getWrapper();
 
-    var store = this.getMaintenancesStore();
+    var store = this.getMaintenanceDetailsStore();
     var record = form.getRecord();
     var values = form.getValues();
 
@@ -188,7 +329,7 @@ Ext.define('AM.controller.Maintenances', {
 		}else{
 			//  no record at all  => gonna create the new one 
 			var me  = this; 
-			var newObject = new AM.model.Maintenance( values ) ;
+			var newObject = new AM.model.MaintenanceDetail( values ) ;
 			
 			// learnt from here
 			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
@@ -222,7 +363,7 @@ Ext.define('AM.controller.Maintenances', {
     var record = this.getList().getSelectedObject();
 
     if (record) {
-      var store = this.getMaintenancesStore();
+      var store = this.getMaintenanceDetailsStore();
       store.remove(record);
       store.sync();
 // to do refresh programmatically
@@ -241,30 +382,28 @@ Ext.define('AM.controller.Maintenances', {
     }
   },
 
-	diagnoseObject: function(){
+	deactivateObject: function(){
 		// console.log("mark as Deceased is clicked");
-		var view = Ext.widget('diagnosemaintenanceform');
+		var view = Ext.widget('deactivatemaintenancedetailform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
 		// view.down('form').getForm().findField('c').setValue(record.get('deceased_at')); 
     view.show();
 	},
 	
-	executeDiagnose : function(button){
+	executeDeactivate : function(button){
 		var me = this; 
 		var win = button.up('window');
     var form = win.down('form');
 		var list = this.getList();
 
-    var store = this.getMaintenancesStore();
+    var store = this.getMaintenanceDetailsStore();
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
  
 		if(record){
 			var rec_id = record.get("id");
-			record.set( 'diagnosis_case' , values['diagnosis_case'] );
-			record.set( 'diagnosis' , values['diagnosis'] );
-			record.set( 'diagnosis_date' , values['diagnosis_date'] );
+			record.set( 'deactivation_case' , values['deactivation_case'] );
 			 
 			// form.query('checkbox').forEach(function(checkbox){
 			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
@@ -273,67 +412,7 @@ Ext.define('AM.controller.Maintenances', {
 			form.setLoading(true);
 			record.save({
 				params : {
-					diagnosis: true 
-				},
-				success : function(record){
-					form.setLoading(false);
-					
-					// list.fireEvent('confirmed', record);
-					
-					
-					store.load();
-					win.close();
-					
-				},
-				failure : function(record,op ){
-					// console.log("Fail update");
-					form.setLoading(false);
-					var message  = op.request.scope.reader.jsonData["message"];
-					var errors = message['errors'];
-					form.getForm().markInvalid(errors);
-					record.reject(); 
-					// this.reject(); 
-				}
-			});
-		}
-	},
-	
-	
-	solveObject: function(){
-		// console.log("mark as Deceased is clicked");
-		var view = Ext.widget('solvemaintenanceform');
-		var record = this.getList().getSelectedObject();
-		view.setParentData( record );
-		// view.down('form').getForm().findField('c').setValue(record.get('deceased_at')); 
-    view.show();
-	},
-	
-	executeSolve : function(button){
-		var me = this; 
-		var win = button.up('window');
-    var form = win.down('form');
-		var list = this.getList();
-
-    var store = this.getMaintenancesStore();
-		var record = this.getList().getSelectedObject();
-    var values = form.getValues();
- 
-		if(record){
-			var rec_id = record.get("id");
-			
-			record.set( 'solution_case' , values['solution_case'] );
-			record.set( 'solution' , values['solution'] );
-			record.set( 'solution_date' , values['solution_date'] );
-			
-			 
-			// form.query('checkbox').forEach(function(checkbox){
-			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
-			// });
-			// 
-			form.setLoading(true);
-			record.save({
-				params : {
-					solve: true 
+					deactivate: true 
 				},
 				success : function(record){
 					form.setLoading(false);
@@ -370,9 +449,11 @@ Ext.define('AM.controller.Maintenances', {
 
     if (selections.length > 0) {
 			grid.enableAddButton();
+			parentList.enableRecordButtons();
       // grid.enableRecordButtons();
     } else {
 			grid.disableAddButton();
+			parentList.disableRecordButtons();
       // grid.disableRecordButtons();
     }
 		
@@ -391,5 +472,108 @@ Ext.define('AM.controller.Maintenances', {
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;
 		grid.getStore().load(); 
   },
+
+
+	updateResultObject: function(){
+		
+		
+		var parentObject = this.getParentList().getSelectedObject();
+		var record = this.getList().getSelectedObject();
+		
+		
+		if( parentObject && record ) {
+			var view = Ext.widget('updatemaintenanceresultform');
+			view.show();
+			view.setParentData(parentObject);
+			view.setData( record );
+			view.setExtraParamForJsonRemoteStore( record.get("component_id"));
+		}
+		
+		
+	  
+	},
+	
+ 
+	reloadRecord: function(record){
+		// console.log("Inside reload record");
+		// console.log( record );
+		var list = this.getList();
+		var store = this.getList().getStore();
+		var modifiedId = record.get('id');
+		
+		AM.model.MaintenanceDetail.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, master) {
+		        //do something if the load failed
+		    },
+		    success: function(record, master) {
+			
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(record.getData());
+					recToUpdate.commit();
+					list.getView().refreshNode(store.indexOfId(modifiedId));
+					list.enableRecordButtons();
+		    },
+		    callback: function(record, master) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
+	
+	
+	executeUpdateResult: function(button){
+		// console.log("Execute update result");
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+		var parentList  = this.getParentList();
+
+    var store = this.getMaintenancesStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			
+			var rec_id = record.get("id");
+			form.query('checkbox').forEach(function(checkbox){
+				record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			}); 
+			
+			record.set( values );
+			
+			// console.log("The values");
+			// console.log( values );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					confirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					// store.load();
+					// parentList.enableRecordButtons();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	}, 
 
 });

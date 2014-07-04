@@ -130,9 +130,9 @@ ActiveRecord::Schema.define(version: 20140630120758) do
     t.datetime "complaint_date"
     t.text     "complaint"
     t.integer  "complaint_case"
-    t.boolean  "is_confirmed",      default: false
-    t.datetime "confirmation_date"
-    t.boolean  "is_deleted",        default: false
+    t.boolean  "is_confirmed",   default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",     default: false
     t.integer  "warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"

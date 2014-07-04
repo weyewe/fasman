@@ -5,7 +5,7 @@ json.assets @objects do |object|
 	json.id 								object.id  
 	
 
- 
+ 	
 	 
 	json.contact_id		object.contact_id 
 	json.contact_name		object.contact.name 

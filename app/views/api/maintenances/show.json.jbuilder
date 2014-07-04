@@ -12,9 +12,6 @@ json.maintenances @objects do |object|
   json.complaint    					object.complaint 
   json.complaint_case   			object.complaint_case
 
-
-	json.machine_name object.asset.machine.name 
-	json.machine_id object.asset.machine.id 
  
 	
 	if object.complaint_case == MAINTENANCE_CASE[:scheduled]

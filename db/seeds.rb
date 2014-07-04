@@ -116,6 +116,28 @@ data_entry_role = Role.create!(
   
   puts "Total compatibility: #{Compatibility.count}" 
   
+  counter  = 0 
+  Contact.all.each do |contact|
+    Machine.all.each do |machine|
+       
+      asset = Asset.create_object(
+        :machine_id           => machine.id,
+        :contact_id           => contact.id,
+        :description          =>"awesome",
+        :code => "code #{counter}"
+      )
+      
+      counter += 1 
+      
+      if asset.errors.size != 0 
+        asset.errors.messages.each do |x|
+          puts "create asset error : #{x}"
+        end
+      end
+      
+    end
+  end
+  
 
   (1..3).each do |x|
     Warehouse.create_object(
@@ -272,3 +294,23 @@ DeliveryOrder.all.each do |d_o|
 end
 
 puts "Total d_o detail: #{DeliveryOrderDetail.count}"
+
+AssetDetail.all.each do |asset_detail|
+  
+  
+  asset_detail.assign_initial_item(
+    :initial_item_id => asset_detail.component.items.first .id 
+  )
+end
+
+Asset.all.each do |asset|
+  Maintenance.create_object(
+    :asset_id       => asset.id , 
+    :complaint_date => DateTime.now , 
+    :complaint      => "aesome",
+    :complaint_case => MAINTENANCE_CASE[:emergency],
+    :warehouse_id   => Warehouse.first.id 
+  )
+end
+
+puts "Total maintenance #{Maintenance.count}"

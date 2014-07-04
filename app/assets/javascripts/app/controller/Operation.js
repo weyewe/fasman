@@ -84,6 +84,19 @@ Ext.define("AM.controller.Operation", {
 			
 			// do maintenance
 			
+			{ 
+				text:'Maintenance', 
+				viewClass:'AM.view.operation.Maintenance', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'maintenances',
+					action : 'index'
+				}
+				]
+			},
+			
 			 
     ]
 	},

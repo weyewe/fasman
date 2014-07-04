@@ -12,40 +12,26 @@ Ext.define('AM.view.operation.maintenance.Form', {
 	
   initComponent: function() {
 	
-	
-		var localJsonStoreComplaintCase = Ext.create(Ext.data.Store, {
-			type : 'array',
-			storeId : 'complaint_case_selector',
-			fields	: [ 
-				{ name : "complaint_case"}, 
-				{ name : "complaint_case_text"}  
-			], 
-			data : [
-				{ complaint_case : 1, complaint_case_text : "Scheduled"},
-				{ complaint_case : 2, complaint_case_text : "Emergency"}
-			] 
-		});
-		
-		var remoteJsonStoreItem = Ext.create(Ext.data.JsonStore, {
-			storeId : 'item_search',
+		var remoteJsonStoreAsset = Ext.create(Ext.data.JsonStore, {
+			storeId : 'asset_search',
 			fields	: [
 			 		{
-						name : 'item_code',
+						name : 'asset_contact_name',
+						mapping : "contact_name"
+					} ,
+					{
+						name : 'asset_code',
 						mapping : "code"
 					} ,
 					{
-						name : 'item_description',
-						mapping : "description"
+						name : 'asset_machine_name',
+						mapping : "machine_name"
 					} ,
 					
 					{
-						name : 'item_id',
+						name : 'asset_id',
 						mapping : "id"
-					}  ,
-					{
-						name : 'type_name',
-						mapping : "type_name"
-					} ,
+					}  
 			],
 			
 		 
@@ -54,7 +40,7 @@ Ext.define('AM.view.operation.maintenance.Form', {
 					parent_id : null
 				},
 				type : 'ajax',
-				url : 'api/search_item',
+				url : 'api/search_asset',
 				reader : {
 					type : 'json',
 					root : 'records', 
@@ -64,23 +50,31 @@ Ext.define('AM.view.operation.maintenance.Form', {
 			autoLoad : false 
 		});
 		
-		var remoteJsonStoreUser = Ext.create(Ext.data.JsonStore, {
-			storeId : 'user_search',
+		var remoteJsonStoreWarehouse = Ext.create(Ext.data.JsonStore, {
+			storeId : 'warehouse_search',
 			fields	: [
 			 		{
-						name : 'user_name',
+						name : 'warehouse_name',
 						mapping : "name"
 					} ,
 					{
-						name : 'user_id',
+						name : 'warehouse_description',
+						mapping : "description"
+					} ,
+					
+					{
+						name : 'warehouse_id',
 						mapping : "id"
 					}  
 			],
 			
 		 
 			proxy  	: {
+				extraParams : {
+					parent_id : null
+				},
 				type : 'ajax',
-				url : 'api/search_user',
+				url : 'api/search_warehouse',
 				reader : {
 					type : 'json',
 					root : 'records', 
@@ -89,8 +83,6 @@ Ext.define('AM.view.operation.maintenance.Form', {
 			},
 			autoLoad : false 
 		});
-		
-	
 	  
     this.items = [{
       xtype: 'form',
@@ -108,102 +100,61 @@ Ext.define('AM.view.operation.maintenance.Form', {
 	        fieldLabel: 'id'
 	      },
 				{
-					xtype: 'displayfield',
-					name : 'customer_name',
-					fieldLabel: 'Customer'
-				},
-				{
-					xtype: 'hidden',
-					name : 'customer_id',
-					fieldLabel: 'Customer Id'
-				},
-	  
-				
-				{
-	        xtype: 'customdatetimefield',
-	        name : 'complaint_date',
-	        fieldLabel: ' Waktu complaint',
-					dateCfg : {
-						format: 'Y-m-d'
-					},
-					timeCfg : {
-						increment : 15
-					}
-				},
-				
-				{
-					fieldLabel: 'Kasus Complaint',
+					fieldLabel: 'Asset',
 					xtype: 'combo',
 					queryMode: 'remote',
 					forceSelection: true, 
-					displayField : 'complaint_case_text',
-					valueField : 'complaint_case',
+					displayField : 'asset_code',
+					valueField : 'asset_id',
 					pageSize : 5,
 					minChars : 1, 
 					allowBlank : false, 
 					triggerAction: 'all',
-					store : localJsonStoreComplaintCase, 
+					store : remoteJsonStoreAsset , 
 					listConfig : {
 						getInnerTpl: function(){
-							return  	'<div data-qtip="{complaint_case_text}">' +  
-													'<div class="combo-name">{complaint_case_text}</div>' +
+							return  	'<div data-qtip="{asset_code}">' + 
+													'<div class="combo-name">{asset_code}</div>' +   
+													'<div>{asset_contact_name}</div>' + 
 							 					'</div>';
 						}
 					},
-					name : 'complaint_case' 
+					name : 'asset_id' 
+				},
+				{
+					fieldLabel: 'Warehouse',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'warehouse_name',
+					valueField : 'warehouse_id',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : remoteJsonStoreWarehouse , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{warehouse_name}">' + 
+													'<div class="combo-name">{warehouse_name}</div>' +   
+													'<div>{warehouse_description}</div>' + 
+							 					'</div>';
+						}
+					},
+					name : 'warehouse_id' 
+				},
+				{
+					xtype: 'datefield',
+					name : 'complaint_date',
+					fieldLabel: 'Tanggal Request',
+					format: 'Y-m-d',
 				},
 				
 				{
-					xtype: 'textarea',
+					xtype: 'textfield',
 					name : 'complaint',
-					fieldLabel: 'Detail Complaint'
+					fieldLabel: 'Deskripsi'
 				},
-				
-				{
-					fieldLabel: 'Karyawan Pelaksana',
-					xtype: 'combo',
-					queryMode: 'remote',
-					forceSelection: true, 
-					displayField : 'user_name',
-					valueField : 'user_id',
-					pageSize : 5,
-					minChars : 1, 
-					allowBlank : false, 
-					triggerAction: 'all',
-					store : remoteJsonStoreUser, 
-					listConfig : {
-						getInnerTpl: function(){
-							return  	'<div data-qtip="{user_name}">' +  
-													'<div class="combo-name">{user_name}</div>' +
-							 					'</div>';
-						}
-					},
-					name : 'user_id' 
-				},
-				
-				{
-					fieldLabel: 'Item',
-					xtype: 'combo',
-					queryMode: 'remote',
-					forceSelection: true, 
-					displayField : 'item_code',
-					valueField : 'item_id',
-					pageSize : 5,
-					minChars : 1, 
-					allowBlank : false, 
-					triggerAction: 'all',
-					store : remoteJsonStoreItem, 
-					listConfig : {
-						getInnerTpl: function(){
-							return  	'<div data-qtip="{item_code}">' +  
-													'<div class="combo-name">{type_name} | {item_code}</div>' +
-													'<div class="combo-name">{item_description}</div>' +
-							 					'</div>';
-						}
-					},
-					name : 'item_id' 
-				},
-			
 				
 			]
     }];
@@ -220,58 +171,43 @@ Ext.define('AM.view.operation.maintenance.Form', {
     this.callParent(arguments);
   },
 
-	setSelectedItem: function( item_id ){
-		var comboBox = this.down('form').getForm().findField('item_id'); 
+	 
+	setSelectedAsset: function( asset_id ){
+		var comboBox = this.down('form').getForm().findField('asset_id'); 
 		var me = this; 
 		var store = comboBox.store;  
 		store.load({
 			params: {
-				selected_id : item_id 
+				selected_id : asset_id 
 			},
 			callback : function(records, options, success){
 				me.setLoading(false);
-				comboBox.setValue( item_id );
+				comboBox.setValue( asset_id );
 			}
 		});
 	},
 	
-	setSelectedUser: function( user_id ){
-		var comboBox = this.down('form').getForm().findField('user_id'); 
+	setSelectedWarehouse: function( warehouse_id ){
+		var comboBox = this.down('form').getForm().findField('warehouse_id'); 
 		var me = this; 
 		var store = comboBox.store;  
 		store.load({
 			params: {
-				selected_id : user_id 
+				selected_id : warehouse_id 
 			},
 			callback : function(records, options, success){
 				me.setLoading(false);
-				comboBox.setValue( user_id );
+				comboBox.setValue( warehouse_id );
 			}
 		});
 	},
-	
-	
- 
-	
-	
-	setComboBoxExtraParams: function( parent_id ) {
-		var me =this;
-		me.setExtraParamInItemComboBox( parent_id );
-	},
-	
-	
-	
+
 	setComboBoxData : function( record){
-		// console.log("gonna set combo box data");
 		var me = this; 
 		me.setLoading(true);
-		me.setSelectedItem( record.get("item_id")  ) ; 
-		me.setSelectedUser( record.get("user_id")  ) ;
-	},
-	 
-	setParentData: function( record ){
-		this.down('form').getForm().findField('customer_name').setValue(record.get('name')); 
-		this.down('form').getForm().findField('customer_id').setValue(record.get('id')); 
+		
+		me.setSelectedAsset( record.get("asset_id")  ) ; 
+		me.setSelectedWarehouse( record.get("warehouse_id")  ) ; 
 	},
 	
 });

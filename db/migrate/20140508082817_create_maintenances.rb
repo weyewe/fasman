@@ -15,7 +15,7 @@ class CreateMaintenances < ActiveRecord::Migration
       
       
       t.boolean :is_confirmed, :default => false 
-      t.datetime :confirmation_date 
+      t.datetime :confirmed_at
        
       
       t.boolean :is_deleted, :default => false 
