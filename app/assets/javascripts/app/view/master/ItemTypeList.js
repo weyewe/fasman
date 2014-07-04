@@ -1,34 +1,23 @@
-Ext.define('AM.view.master.itemtype.List' ,{
+Ext.define('AM.view.master.ItemTypeList' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.itemtypelist',
+  	alias : 'widget.masteritemtypeList',
 
   	store: 'ItemTypes', 
- 
+   
 
 	initComponent: function() {
 		this.columns = [
-			{ header: 'ID', dataIndex: 'id'},
-			{ header: 'Nama',  dataIndex: 'name', flex: 1},
-			{	header: 'Deskripsi', dataIndex: 'description', flex: 1 } 
+		
+			{
+				xtype : 'templatecolumn',
+				text : "ItemType",
+				flex : 1,
+				tpl : '<b>{name}</b>' 
+				
+			}, 
 		];
 
-		this.addObjectButton = new Ext.Button({
-			text: 'Add ',
-			action: 'addObject'
-		});
-
-		this.editObjectButton = new Ext.Button({
-			text: 'Edit ',
-			action: 'editObject',
-			disabled: true
-		});
-
-		this.deleteObjectButton = new Ext.Button({
-			text: 'Delete ',
-			action: 'deleteObject',
-			disabled: true
-		});
-		
+	 
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
 			hideLabel: true,
@@ -39,7 +28,7 @@ Ext.define('AM.view.master.itemtype.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton, this.searchField ];
+		this.tbar = [this.searchField ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,

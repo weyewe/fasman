@@ -31,7 +31,7 @@ Ext.define('AM.view.master.itemtype.Form', {
 				{
 	        xtype: 'textfield',
 	        name : 'name',
-	        fieldLabel: 'Tipe Item Support'
+	        fieldLabel: 'Kategori Item'
 	      },
 				{
 					xtype: 'textfield',

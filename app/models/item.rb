@@ -1,6 +1,7 @@
 class Item < ActiveRecord::Base
   has_many :warehouses, :through => :warehouse_items
   has_many :warehouse_items 
+  belongs_to :item_type
   
   has_many :price_mutations 
   
@@ -9,25 +10,46 @@ class Item < ActiveRecord::Base
   
   has_many :compatibilities
   has_many :components, :through => :compatibilities
+  validate :valid_item_type_id 
+  
+  validates_presence_of :sku , :item_type_id 
+  
+  def valid_item_type_id
+    return if not item_type_id.present?
+    
+    object = ItemType.find_by_id item_type_id
+    
+    if object.nil?
+      self.errros.add(:generic_errors, "Harus valid")
+      return self 
+    end
+  end
+  
   
   def uniq_sku_in_active_objects
+    return if not sku.present?
+    
     total_duplicate_count = Item.where(:sku => self.sku, :is_deleted => false).count
+    target = Item.where(:sku => self.sku).first
     
     if not self.persisted? and total_duplicate_count != 0 
       self.errors.add(:sku, "Harus unik")
       return self 
     end
     
-    if self.persisted? and total_duplicate_count > 1 
+    if self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
       self.errors.add(:sku, "Harus unik")
       return self 
     end
   end
+   
+  
   
   def self.create_object( params ) 
     new_object = self.new
     new_object.sku = params[:sku]
     new_object.description = params[:description]
+    new_object.item_type_id = params[:item_type_id]
     new_object.save
     
     return new_object 

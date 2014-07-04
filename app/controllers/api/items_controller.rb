@@ -5,26 +5,56 @@ class Api::ItemsController < Api::BaseApiController
     
     
     if params[:livesearch].present? 
-      livesearch = "%#{params[:livesearch]}%"
-      @objects = Item.where{ 
-        (
-          (description =~  livesearch ) | 
-          (sku =~  livesearch )
-        )
-        
-      }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = Item.where{ 
-        (
-          (description =~  livesearch ) | 
-          (sku  =~  livesearch )
-        )
-      }.count
+      if params[:parent_id].present? and params[:parent_id].length != 0
+        livesearch = "%#{params[:livesearch]}%"
+        @objects = Item.active_objects.joins(:item_type).where{ 
+          (item_type_id.eq params[:parent_id]) & 
+          (
+            (description =~  livesearch ) | 
+            (sku =~  livesearch )
+          )
+
+        }.page(params[:page]).per(params[:limit]).order("id DESC")
+
+        @total = Item.where{ 
+          (item_type_id.eq params[:parent_id]) & 
+          (
+            (description =~  livesearch ) | 
+            (sku  =~  livesearch )
+          )
+        }.count
+      else
+        livesearch = "%#{params[:livesearch]}%"
+        @objects = Item.active_objects.joins(:item_type).where{ 
+          (
+            (description =~  livesearch ) | 
+            (sku =~  livesearch )
+          )
+
+        }.page(params[:page]).per(params[:limit]).order("id DESC")
+
+        @total = Item.where{ 
+          (
+            (description =~  livesearch ) | 
+            (sku  =~  livesearch )
+          )
+        }.count
+      end
+      
       
     else
-      @objects = Item.active_objects.
-                  page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = Item.active_objects.count
+      if params[:parent_id].present? and params[:parent_id].length != 0
+        @objects = Item.active_objects.where(:item_type_id => params[:parent_id]).joins(:item_type).
+                    page(params[:page]).per(params[:limit]).order("id DESC")
+        @total = Item.active_objects.where(:item_type_id => params[:parent_id]).count
+      else
+        @objects = Item.active_objects.joins(:item_type).
+                    page(params[:page]).per(params[:limit]).order("id DESC")
+        @total = Item.active_objects.count
+      end
+      
+      
     end
     
   end

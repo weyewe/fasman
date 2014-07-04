@@ -9,7 +9,10 @@ Ext.define('AM.model.Item', {
 			{ name: 'pending_delivery', type: 'int' },
 			
     	{ name: 'sku', type: 'string' } ,
-			{ name: 'description', type: 'string' } 
+			{ name: 'description', type: 'string' } ,
+			
+			{ name: 'item_type_id', type: 'int' } ,
+			{ name: 'item_type_name', type: 'string' } ,
   	],
 
 	 

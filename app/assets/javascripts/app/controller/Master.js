@@ -102,6 +102,18 @@ Ext.define("AM.controller.Master", {
 				]
 			},
 			{ 
+				text:'Item Category', 
+				viewClass:'AM.view.master.ItemType', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'item_types',
+					action : 'index'
+				}
+				]
+			},
+			{ 
 				text:'Item', 
 				viewClass:'AM.view.master.Item', 
 				leaf:true, 

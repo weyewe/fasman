@@ -12,8 +12,32 @@ Ext.define('AM.view.master.item.Form', {
 	
   initComponent: function() {
 		var me = this; 
-	 
-		 
+
+		var remoteJsonStoreType = Ext.create(Ext.data.JsonStore, {
+			storeId : 'type_search',
+			fields	: [
+			{
+				name : 'item_type_name',
+				mapping : "name"
+				} ,
+				{
+					name : 'item_type_id',
+					mapping : "id"
+				}  
+				],
+
+
+				proxy  	: {
+					type : 'ajax',
+					url : 'api/search_item_type',
+					reader : {
+						type : 'json',
+						root : 'records', 
+						totalProperty  : 'total'
+					}
+				},
+				autoLoad : false 
+			});
 		
 		 
 		
@@ -34,6 +58,16 @@ Ext.define('AM.view.master.item.Form', {
 	        xtype: 'hidden',
 	        name : 'id',
 	        fieldLabel: 'id'
+	      }, 
+				{
+	        xtype: 'hidden',
+	        name : 'item_type_id',
+	        fieldLabel: 'Item Type Id'
+	      },
+				{
+	        xtype: 'displayfield',
+	        name : 'item_type_name',
+	        fieldLabel: 'Item Category'
 	      },
 			
 				
@@ -92,7 +126,9 @@ Ext.define('AM.view.master.item.Form', {
 	
 	setParentData: function( record ){
 		// this.down('form').getForm().findField('customer_name').setValue(record.get('name')); 
-		// this.down('form').getForm().findField('customer_id').setValue(record.get('id')); 
+		// this.down('form').getForm().findField('customer_id').setValue(record.get('id'));
+		this.down('form').getForm().findField('item_type_name').setValue(record.get('name')); 
+		this.down('form').getForm().findField('item_type_id').setValue(record.get('id')); 
 	},
 });
 
