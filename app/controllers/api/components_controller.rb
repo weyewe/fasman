@@ -97,20 +97,41 @@ class Api::ComponentsController < Api::BaseApiController
     if params[:selected_id].nil?  or params[:selected_id].length == 0 
       selected_id = nil
     end
+    selected_parent_id = params[:parent_id]
     
     query = "%#{search_params}%"
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = Component.active_objects.joins(:machine).where{ (name =~ query)   
-                              }.
-                        page(params[:page]).
-                        per(params[:limit]).
-                        order("id DESC")
-                        
-      @total = Component.active_objects.where{ (name =~ query)  
-                              }.count
+      if params[:parent_id].nil?
+        @objects = Component.active_objects.joins(:machine).where{ (name =~ query)   
+                                }.
+                          page(params[:page]).
+                          per(params[:limit]).
+                          order("id DESC")
+
+        @total = Component.active_objects.where{ (name =~ query)  
+                                }.count
+      else
+        @objects = Component.active_objects.joins(:machine).where{ 
+                            (machine_id.eq selected_parent_id  ) & 
+                            (name =~ query)   
+                                }.
+                          page(params[:page]).
+                          per(params[:limit]).
+                          order("id DESC")
+
+        @total = Component.active_objects.where{ 
+                            (machine_id.eq selected_parent_id  ) & 
+                            (name =~ query)
+                                }.count
+      end
+      
+                              
+  
     else
+      
+      
       @objects = Component.active_objects.joins(:machine).where{ (id.eq selected_id)  
                               }.
                         page(params[:page]).

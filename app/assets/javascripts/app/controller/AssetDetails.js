@@ -193,6 +193,7 @@ Ext.define('AM.controller.AssetDetails', {
 			
 			view.setParentData1(parentObject1);
 			view.setParentData2(parentObject2);
+			view.setExtraParamForJsonRemoteStore( parentObject2.get("machine_id"));
 		}
   },
 
@@ -308,6 +309,109 @@ Ext.define('AM.controller.AssetDetails', {
     }
   },
 
+	reloadRecord: function(record){
+		// console.log("Inside reload record");
+		// console.log( record );
+		var list = this.getList();
+		var store = this.getList().getStore();
+		var modifiedId = record.get('id');
+		
+		console.log("in reloadRecord");
+		console.log( record) ;
+		
+		AM.model.AssetDetail.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, master) {
+		        //do something if the load failed
+		    },
+		    success: function(record, master) {
+			
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(record.getData());
+					recToUpdate.commit();
+					list.getView().refreshNode(store.indexOfId(modifiedId));
+					list.enableRecordButtons();
+		    },
+		    callback: function(record, master) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
+	
+	
+	assignObject: function(){
+	 
+		
+		var me = this; 
+    var record = this.getList().getSelectedObject();
+		var parentObject1  = this.getParentList1().getSelectedObject();
+		var parentObject2  = this.getParentList1().getSelectedObject();
+		
+		if( record ) {
+			var view = Ext.widget('assetdetailassignform');
+			view.show();
+			view.setExtraParamForJsonRemoteStore( record.get("component_id")); // component_id
+			view.setParentData1(parentObject1);
+			view.setParentData2(parentObject2);
+			view.setComboBoxData( record ) ;
+			view.down('form').loadRecord(record);
+		}
+		
+		
+
+    
+
+	},
+	
+	
+	executeAssignObject: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+		
+		var parentObject1  = this.getParentList1().getSelectedObject();
+		var parentObject2  = this.getParentList1().getSelectedObject();
+
+    var store = this.getAssetDetailsStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'initial_item_id' , values['initial_item_id'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					assign: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					// store.load();
+					// parentList.enableRecordButtons();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
 
 
 	

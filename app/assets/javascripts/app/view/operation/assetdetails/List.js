@@ -9,7 +9,8 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 		this.columns = [
 			// { header: 'Member', dataIndex: 'member_name' , flex : 1 },
 			{ header: 'Component',  dataIndex: 'component_name', flex : 1  },
-			{ header: 'Current Item',  dataIndex: 'current_item_name', flex : 1  },
+			{ header: 'Current Item',  dataIndex: 'current_item_sku', flex : 1  },
+			{ header: 'Initial Item',  dataIndex: 'initial_item_sku', flex : 1  },
 			
 		];
 
@@ -31,6 +32,12 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 			disabled: true
 		});
 		
+		this.assignObjectButton = new Ext.Button({
+			text: 'Assign Initial Item',
+			action: 'assignObject',
+			disabled: true
+		});
+		
 		// this.deactivateObjectButton = new Ext.Button({
 		// 	text: 'Deactivate',
 		// 	action: 'deactivateObject',
@@ -47,7 +54,7 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton,   
+		this.tbar = [this.addObjectButton,   this.assignObjectButton
 		  			// '-', 
 		// this.deactivateObjectButton
 		
@@ -78,6 +85,8 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
+		
+		this.assignObjectButton.enable();
 		// this.deactivateObjectButton.enable();
 		
 	},
@@ -85,6 +94,7 @@ Ext.define('AM.view.operation.assetdetail.List' ,{
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
+		this.assignObjectButton.disable();
 		// this.deactivateObjectButton.disable();
 	}
 });

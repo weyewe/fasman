@@ -28,6 +28,9 @@ Ext.define('AM.view.operation.assetdetail.Form', {
 			
 		 
 			proxy  	: {
+				extraParams : {
+					parent_id : null
+				},
 				type : 'ajax',
 				url : 'api/search_component',
 				reader : {
@@ -107,7 +110,21 @@ Ext.define('AM.view.operation.assetdetail.Form', {
  
   },
 
-
+	
+	
+	setExtraParamInAssetDetailComboBox: function(parent_id){
+		
+		var comboBox = this.down('form').getForm().findField('component_id'); 
+		var store = comboBox.store;
+		
+		store.getProxy().extraParams.parent_id =  parent_id;
+	},
+	
+	setExtraParamForJsonRemoteStore: function( parent_id ) {
+		var me =this;
+		me.setExtraParamInAssetDetailComboBox( parent_id );
+	},
+	
 	
 
 	setComboBoxData : function( record){ 

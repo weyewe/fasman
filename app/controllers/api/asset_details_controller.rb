@@ -61,7 +61,7 @@ class Api::AssetDetailsController < Api::BaseApiController
   def update
     
     @object = AssetDetail.find_by_id params[:id] 
-    @object.update_object( params[:asset_detail])
+    @object.assign_initial_item( params[:asset_detail])
      
     if @object.errors.size == 0 
       render :json => { :success => true,   
@@ -77,6 +77,28 @@ class Api::AssetDetailsController < Api::BaseApiController
       
       render :json => msg 
     end
+  end
+  
+  def show
+    @object = AssetDetail.find_by_id params[:id] 
+    @objects = [@object]
+    @total = 1 
+      # 
+      #   render :json => { :success => true, 
+      #                     :asset_details => [
+      #                         :id              =>  @object.id             , 
+      #                         :warehouse_id    =>  @object.warehouse_id   , 
+      #                         :warehouse_name  =>  @object.warehouse.name , 
+      #                         :sales_order_id  =>  @object.sales_order_id , 
+      #                         :is_confirmed    =>  @object.is_confirmed   ,  
+      #                         :is_deleted      =>  @object.is_deleted     , 
+      #                         :description     =>  @object.description    ,       
+      #                         :delivery_date =>  format_date_friendly( @object.delivery_date )  ,  
+      #                         :confirmed_at    =>  format_date_friendly( @object.confirmed_at )
+      #                         
+      #                         
+      #                       ] , 
+      #                     :total => DeliveryOrder.active_objects.count }
   end
 
   def destroy

@@ -6,6 +6,34 @@ class AssetDetail < ActiveRecord::Base
   belongs_to :asset
   belongs_to :component  
   
+  validate :unique_component
+  
+  def unique_component
+    return if not component_id.present? 
+    return if not asset_id.present? 
+    
+    component_count  = AssetDetail.where(
+      :component_id => component_id,
+      :asset_id => asset_id
+    ).count 
+    
+    component_detail = AssetDetail.where(
+      :component_id => component_id,
+      :asset_id => asset_id
+    ).first
+    
+    if self.persisted? and component_detail.id != self.id   and component_count == 1
+      self.errors.add(:component_id, "Component harus uniq dalam 1 asset")
+      return self 
+    end
+    
+    # there is item with such item_id in the database
+    if not self.persisted? and component_count != 0 
+      self.errors.add(:component_id, "Component harus uniq dalam 1 pemesanan")
+      return self
+    end
+  end
+  
   
   
   def self.create_object( params ) 
@@ -38,6 +66,16 @@ class AssetDetail < ActiveRecord::Base
   end 
   
   def assign_initial_item( params ) 
+    
+    self.initial_item_id = params[:initial_item_id]
+    self.current_item_id = params[:initial_item_id]
+    
+    
+    if initial_item.nil?
+      self.errors.add(:generic_errors, "harus memilih item")
+      return self 
+    end
+    
     compatibility_count = self.component.compatibilities.where(:item_id => params[:initial_item_id]).count
     
     if compatibility_count == 0
@@ -45,8 +83,8 @@ class AssetDetail < ActiveRecord::Base
       return self 
     end
     
-    self.initial_item_id = params[:initial_item_id]
-    self.current_item_id = params[:initial_item_id]
+    
+    
     self.save 
   end
   

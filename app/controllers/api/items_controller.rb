@@ -95,23 +95,50 @@ class Api::ItemsController < Api::BaseApiController
     if params[:selected_id].nil?  or params[:selected_id].length == 0 
       selected_id = nil
     end
-    
+    selected_parent_id = params[:parent_id]
     query = "%#{search_params}%"
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = Item.where{ 
-                            (sku =~ query)  | 
-                            (description =~ query)
-                              }.
-                        page(params[:page]).
-                        per(params[:limit]).
-                        order("id DESC")
-                        
-      @total = Item.where{ 
-              (sku =~ query)  | 
-              (description =~ query)
-                              }.count
+      if params[:parent_id].nil?
+        @objects = Item.where{ 
+                              (sku =~ query)  | 
+                              (description =~ query)
+                                }.
+                          page(params[:page]).
+                          per(params[:limit]).
+                          order("id DESC")
+
+        @total = Item.where{ 
+                (sku =~ query)  | 
+                (description =~ query)
+                                }.count
+      else
+        component = Component.find_by_id params[:parent_id]
+        item_compatibility_list = component.compatibilities.map{|x| x.item_id}
+        
+        @objects = Item.joins(:compatibilities).where{ 
+                              ( id.in item_compatibility_list ) &
+                              (
+                                (sku =~ query)  | 
+                                (description =~ query)
+                              )
+                              
+                              
+                                }.
+                          page(params[:page]).
+                          per(params[:limit]).
+                          order("id DESC")
+
+        @total = Item.joins(:compatibilities).where{ 
+                    ( id.in item_compatibility_list ) &
+                    (
+                      (sku =~ query)  | 
+                      (description =~ query)
+                    )
+                                }.count
+      end
+      
     else
       @objects = Item.where{ (id.eq selected_id)  
                               }.
