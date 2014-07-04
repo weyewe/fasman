@@ -23,6 +23,7 @@ Ticketie::Application.routes.draw do
     get 'search_asset' => 'assets#search', :as => :search_asset, :method => :get
     
     # master data 
+    resources :warehouses
     resources :app_users
     resources :customers 
     resources :item_types  

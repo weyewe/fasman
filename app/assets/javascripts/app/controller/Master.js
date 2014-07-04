@@ -88,7 +88,19 @@ Ext.define("AM.controller.Master", {
 		iconCls		: 'text-folder', 
     expanded	: true,
 		children 	: [
-        
+
+			{ 
+				text:'Warehouse', 
+				viewClass:'AM.view.master.Warehouse', 
+				leaf:true, 
+				iconCls:'text',
+				conditions : [
+				{
+					controller : 'warehouses',
+					action : 'index'
+				}
+				]
+			},
 			{ 
 				text:'Item', 
 				viewClass:'AM.view.master.Item', 
