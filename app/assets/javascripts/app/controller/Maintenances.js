@@ -484,8 +484,10 @@ Ext.define('AM.controller.Maintenances', {
 		if( parentObject && record ) {
 			var view = Ext.widget('updatemaintenanceresultform');
 			view.show();
+			view.down('form').loadRecord(record);
 			view.setParentData(parentObject);
 			view.setData( record );
+			view.setComboBoxData( record );
 			view.setExtraParamForJsonRemoteStore( record.get("component_id"));
 		}
 		
@@ -493,7 +495,6 @@ Ext.define('AM.controller.Maintenances', {
 	  
 	},
 	
- 
 	reloadRecord: function(record){
 		// console.log("Inside reload record");
 		// console.log( record );
@@ -502,6 +503,33 @@ Ext.define('AM.controller.Maintenances', {
 		var modifiedId = record.get('id');
 		
 		AM.model.MaintenanceDetail.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, master) {
+		        //do something if the load failed
+		    },
+		    success: function(record, master) {
+			
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(record.getData());
+					recToUpdate.commit();
+					list.getView().refreshNode(store.indexOfId(modifiedId));
+					list.enableRecordButtons();
+		    },
+		    callback: function(record, master) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
+	
+ 
+	reloadParentRecord: function(record){
+		// console.log("Inside reload record");
+		// console.log( record );
+		var list = this.getParentList();
+		var store = this.getParentList().getStore();
+		var modifiedId = record.get('id');
+		
+		AM.model.Maintenance.load( modifiedId , {
 		    scope: list,
 		    failure: function(record, master) {
 		        //do something if the load failed
@@ -534,13 +562,18 @@ Ext.define('AM.controller.Maintenances', {
     var values = form.getValues();
  
 		if(record){
-			
+			record.set( values );
 			var rec_id = record.get("id");
+			console.log("Gonna record the checkbox");
 			form.query('checkbox').forEach(function(checkbox){
 				record.set( checkbox['name']  ,checkbox['checked'] ) ;
+				console.log(checkbox['name']  );
+				console.log( checkbox['checked'] );
+				
+				console.log("content: " + record.get("is_replacement_required") ) ;
 			}); 
 			
-			record.set( values );
+			
 			
 			// console.log("The values");
 			// console.log( values );
@@ -575,5 +608,117 @@ Ext.define('AM.controller.Maintenances', {
 			});
 		}
 	}, 
+	
+	
+/*
+	Confirm unconfirm
+*/
+
+	confirmObject: function(){
+		var view = Ext.widget('confirmmaintenanceform');
+		var record = this.getParentList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	unconfirmObject: function(){
+		var view = Ext.widget('unconfirmmaintenanceform');
+		var record = this.getParentList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	 
+	executeConfirm: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+		var parentList  = this.getParentList();
+
+    var store = this.getMaintenancesStore();
+		var record = this.getParentList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					confirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadParentRecord( record ) ; 
+					// store.load();
+					// parentList.enableRecordButtons();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	executeUnconfirm: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getMaintenancesStore();
+		var record = this.getParentList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unconfirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					// store.load();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
 
 });

@@ -99,7 +99,8 @@ Ext.define('AM.view.operation.assetdetail.AssignForm', {
 					listConfig : {
 						getInnerTpl: function(){
 							return  	'<div data-qtip="{item_sku}">' + 
-													'<div class="combo-name">{item_sku}</div>' +  
+													'<div class="combo-name">{item_sku}</div>' + 
+													'<div>{item_description}</div>' +  
 							 					'</div>';
 						}
 					},

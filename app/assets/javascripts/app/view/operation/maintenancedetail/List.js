@@ -13,7 +13,7 @@ Ext.define('AM.view.operation.maintenancedetail.List' ,{
 				text : "Diagnosis",
 				flex : 1,
 				tpl : '<b>{diagnosis_case_text}</b>' + '<br />' + '<br />' +
-							'<br /> <b>{diagnosis}</b>'  
+							'<br /> {diagnosis}'  
 			},
 			
 			{
@@ -21,7 +21,7 @@ Ext.define('AM.view.operation.maintenancedetail.List' ,{
 				text : "Solution",
 				flex : 1,
 				tpl : '<b>{solution_case_text}</b>' + '<br />' + '<br />' +
-							'<br /> <b>{solution}</b>'  
+							'<br /> {solution}'  
 			},
 			
 			{
@@ -29,7 +29,7 @@ Ext.define('AM.view.operation.maintenancedetail.List' ,{
 				text : "Replacement",
 				flex : 1,
 				tpl : 'Required: <b>{is_replacement_required}</b>' + '<br />' + '<br />' +
-							'<br /> <b>{replacement_item_sku}</b>'  
+							'<br /> {replacement_item_sku}'  
 			},
 			
 			

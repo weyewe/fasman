@@ -38,10 +38,10 @@ class Api::MaintenancesController < Api::BaseApiController
       render :json => { :success => true, 
                         :maintenances => [
                             :id            =>  @object.id             , 
-                            :contact_id    =>   @object.contact_id,
-                            :contact_name  => @object.contact.name , 
+                            :contact_id    =>   @object.asset.contact_id,
+                            :contact_name  => @object.asset.contact.name , 
                             :complaint_date => format_date_friendly( @object.complaint_date ),
-                            :description   => @object.description ,
+                            :complaint   => @object.complaint ,
                             :is_confirmed  => @object.is_confirmed, 
                             :confirmed_at  =>  format_date_friendly( @object.confirmed_at )
                           ] , 
@@ -116,20 +116,23 @@ class Api::MaintenancesController < Api::BaseApiController
   
   def show
     @object = Maintenance.find_by_id params[:id] 
-    render :json => { :success => true, 
-                      :maintenances => [
-                        :id            =>  @object.id             , 
-                        :contact_id    =>   @object.contact_id,
-                        :contact_name  => @object.contact.name , 
-                        :complaint_date => format_date_friendly( @object.complaint_date ),
-                        :description   => @object.description ,
-                        :is_confirmed  => @object.is_confirmed, 
-                        :confirmed_at  =>  format_date_friendly( @object.confirmed_at )
-
-
-                        	
-                        ] , 
-                      :total => Maintenance.active_objects.count }
+    @total = Maintenance.active_objects.count
+    @objects = [@object]
+    # render :json => { :success => true, 
+    #                     :maintenances => [
+    #                       :id            =>  @object.id             , 
+    #                       :contact_id    =>   @object.asset.contact_id,
+    #                       :contact_name  => @object.asset.contact.name , 
+    #                       :complaint_date => format_date_friendly( @object.complaint_date ),
+    #                       :complaint   => @object.complaint ,
+    #                       :is_confirmed  => @object.is_confirmed, 
+    #                       :confirmed_at  =>  format_date_friendly( @object.confirmed_at ),
+    #                       :code => @object.asset.code ,
+    #                       :warehouse_id => @object.warehouse_id,
+    #                       :warehouse_name => @object.warehouse.name 
+    #                         
+    #                       ] , 
+    #                     :total => Maintenance.active_objects.count }
   end
 
   def destroy

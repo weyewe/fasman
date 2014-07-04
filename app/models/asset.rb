@@ -28,7 +28,7 @@ class Asset < ActiveRecord::Base
     new_object.machine_id            = params[:machine_id] 
     new_object.contact_id            = params[:contact_id] 
     new_object.description            = params[:description]
-    new_object.code = params[:code]
+    new_object.code = ( params[:code].present? ? params[:code   ].to_s.upcase : nil )  #  params[:code]
     if new_object.save
       new_object.machine.components.each do |component|
         AssetDetail.create_object(
@@ -49,17 +49,14 @@ class Asset < ActiveRecord::Base
     
     self.contact_id = params[:contact_id]
     self.description      = params[:description    ]
-    self.code = params[:code]
+    self.code = ( params[:code].present? ? params[:code   ].to_s.upcase : nil )
     self.save
     
     return self
   end
   
   def delete_object
-    if self.components.count != 0 
-      self.errors.add(:generic_errors, "Sudah ada komponen")
-      return self 
-    end
+     
     
     if self.maintenances.count != 0 
       self.errors.add(:generic_errors, "sudah ada maintenance")

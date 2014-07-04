@@ -222,17 +222,17 @@ Ext.define('AM.view.operation.maintenancedetail.Form', {
     this.callParent(arguments);
   },
 
-	setSelectedItem: function( item_id ){
-		var comboBox = this.down('form').getForm().findField('item_id'); 
+	setSelectedItem: function( replacement_item_id ){
+		var comboBox = this.down('form').getForm().findField('replacement_item_id'); 
 		var me = this; 
 		var store = comboBox.store;  
 		store.load({
 			params: {
-				selected_id : item_id 
+				selected_id : replacement_item_id 
 			},
 			callback : function(records, options, success){
 				me.setLoading(false);
-				comboBox.setValue( item_id );
+				comboBox.setValue( replacement_item_id );
 			}
 		});
 	},
@@ -241,7 +241,9 @@ Ext.define('AM.view.operation.maintenancedetail.Form', {
 		var me = this; 
 		me.setLoading(true);
 		
-		me.setSelectedItem( record.get("item_id")  ) ; 
+		// console.log("replacement item: " ) ;
+		// console.log( record.get("replacement_item_id")  );
+		me.setSelectedItem( record.get("replacement_item_id")  ) ; 
 	},
 	
 	setParentData: function( record ){

@@ -19,7 +19,8 @@ Ext.define('AM.model.MaintenanceDetail', {
 
 
 			{ name: 'is_replacement_required', type: 'boolean' },  
-			{ name: 'replacement_item_sku', type: 'string' } 
+			{ name: 'replacement_item_sku', type: 'string' } ,
+			{ name: 'replacement_item_id', type: 'int' } 
 			
   	],
 

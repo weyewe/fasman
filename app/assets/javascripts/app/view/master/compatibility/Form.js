@@ -22,6 +22,10 @@ Ext.define('AM.view.master.compatibility.Form', {
 						mapping : "sku"
 					} ,
 					{
+						name : 'item_description',
+						mapping : "description"
+					} ,
+					{
 						name : 'item_id',
 						mapping : "id"
 					}  
@@ -94,6 +98,7 @@ Ext.define('AM.view.master.compatibility.Form', {
 						getInnerTpl: function(){
 							return  	'<div data-qtip="{item_sku}">' + 
 													'<div class="combo-name">{item_sku}</div>' + 
+													'<div>{item_description}</div>' +  
 							 					'</div>';
 						}
 					},

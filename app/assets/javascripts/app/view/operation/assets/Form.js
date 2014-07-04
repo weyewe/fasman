@@ -21,6 +21,15 @@ Ext.define('AM.view.operation.asset.Form', {
 						mapping : "name"
 					} ,
 					{
+						name : 'machine_description',
+						mapping : "description"
+					} ,
+					
+					{
+						name : 'machine_brand',
+						mapping : "brand"
+					} ,
+					{
 						name : 'machine_id',
 						mapping : "id"
 					}  
@@ -87,8 +96,9 @@ Ext.define('AM.view.operation.asset.Form', {
 					listConfig : {
 						getInnerTpl: function(){
 							return  	'<div data-qtip="{machine_name}">' + 
-													'<div class="combo-name">{machine_name}</div>' + 
+													'<div class="combo-name">{machine_name} | {machine_brand}</div>' + 
 													'<div>{machine_description}</div>' + 
+													
 							 					'</div>';
 						}
 					},

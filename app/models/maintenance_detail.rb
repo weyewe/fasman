@@ -119,6 +119,14 @@ class MaintenanceDetail < ActiveRecord::Base
     
     self.validate_update_maintenance_result 
     
+    puts "Gonna call this shite"
+    if   not self.is_replacement_required?
+      puts "333 gonna assign it"
+      self.replacement_item_id = nil 
+    end
+    
+    puts "replacement_item_id : #{replacement_item_id}"
+    
     if self.errors.size == 0 
       self.save
     end
@@ -127,7 +135,7 @@ class MaintenanceDetail < ActiveRecord::Base
   end
   
   def delete_object
-    if self.maintenance.is_confirmed?
+    if self.maintenance.is_confirmed?s
       self.errors.add(:generic_errors, "Sudah konfirmasi")
       return self
     end
