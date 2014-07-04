@@ -172,6 +172,22 @@ class Maintenance < ActiveRecord::Base
     
   end
   
+  def unconfirm
+    if not self.is_confirmed?
+      self.errors.add(:generic_errors, "Belum konfirmasi")
+      return self 
+    end
+    
+    self.maintenance_details.each do |maintenance_detail|
+      maintenance_detail.unconfirm
+    end
+    
+    self.is_confirmed = false 
+    self.confirmed_at = nil
+    self.save 
+    return self 
+  end
+  
   
   def self.active_objects
     self.where(:is_deleted => false )

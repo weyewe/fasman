@@ -64,6 +64,14 @@ Ext.define('AM.controller.Maintenances', {
 				click : this.executeConfirm
 			},
 			
+			'maintenanceProcess maintenancelist button[action=unconfirmObject]': {
+        click: this.unconfirmObject
+			}	,
+			
+			'unconfirmmaintenanceform button[action=unconfirm]' : {
+				click : this.executeUnconfirm
+			},
+			
 			'maintenanceProcess maintenancedetaillist button[action=updateResultObject]': {
         click: this.updateResultObject
 			}	,
@@ -703,7 +711,7 @@ Ext.define('AM.controller.Maintenances', {
 				success : function(record){
 					form.setLoading(false);
 					
-					me.reloadRecord( record ) ; 
+					me.reloadParentRecord( record ) ; 
 					// store.load();
 					
 					win.close();
