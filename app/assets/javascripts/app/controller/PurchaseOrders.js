@@ -236,14 +236,18 @@ Ext.define('AM.controller.PurchaseOrders', {
 
   deleteParentObject: function() {
 		
-    var record = this.getParentList().getSelectedObject();
-
-    if (record) {
-      var store = this.getPurchaseOrdersStore();
-      store.remove(record);
+    var parentObject = this.getParentList().getSelectedObject();
+		
+    if (parentObject) {
+	
+      var store = this.getParentList().store;
+      store.remove(parentObject);
       store.sync();
-// to do refresh programmatically
-			this.getList().query('pagingtoolbar')[0].doRefresh();
+			this.getParentList().query('pagingtoolbar')[0].doRefresh();
+			this.getList().store.loadData([],false);
+			
+			this.getParentList().disableRecordButtons();
+			this.getList().disableAddButton();
     }
 
   },
@@ -436,6 +440,10 @@ Ext.define('AM.controller.PurchaseOrders', {
 	},
 
 	parentSelectionChange: function(selectionModel, selections) {
+		if(selections.length == 0 )
+		{
+			return; 
+		}
 		var me = this; 
     var grid = me.getList();
 		var parentList = me.getParentList();

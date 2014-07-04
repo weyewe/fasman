@@ -101,13 +101,7 @@ Ext.define('AM.view.operation.deliveryorderdetail.Form', {
 	        xtype: 'textfield',
 	        name : 'quantity',
 	        fieldLabel: 'Quantity'
-	      },
-				{
-					xtype: 'textfield',
-					name : 'description',
-					fieldLabel: 'Deskripsi'
-				}
-				
+	      } 
 			]
     }];
 

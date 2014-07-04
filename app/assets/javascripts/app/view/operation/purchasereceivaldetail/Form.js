@@ -101,12 +101,7 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 	        xtype: 'textfield',
 	        name : 'quantity',
 	        fieldLabel: 'Quantity'
-	      },
-				{
-					xtype: 'textfield',
-					name : 'description',
-					fieldLabel: 'Deskripsi'
-				}
+	      } 
 				
 			]
     }];
@@ -155,7 +150,7 @@ Ext.define('AM.view.operation.purchasereceivaldetail.Form', {
 	},
 	
 	setExtraParamForJsonRemoteStore: function( parent_id ) {
-		console.log("Inside setExtraParamForJsonRemoteStore ");
+		// console.log("Inside setExtraParamForJsonRemoteStore ");
 		var me =this;
 		me.setExtraParamInPurchaseOrderDetailComboBox( parent_id );
 	},

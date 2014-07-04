@@ -95,13 +95,7 @@ Ext.define('AM.view.operation.purchaseorderdetail.Form', {
 	        xtype: 'textfield',
 	        name : 'quantity',
 	        fieldLabel: 'Quantity'
-	      },
-				{
-					xtype: 'textfield',
-					name : 'description',
-					fieldLabel: 'Deskripsi'
-				}
-				
+	      }
 			]
     }];
 
