@@ -36,8 +36,7 @@ Ext.define('AM.controller.StockAdjustments', {
 			'stockadjustmentProcess stockadjustmentlist' : {
 				afterrender : this.loadParentObjectList,
 				selectionchange: this.parentSelectionChange,
-				
-				destroy : this.onParentDestroy 
+				'deleted_fail' : this.reloadParentStore 
 			},
 			
 		 
@@ -106,6 +105,14 @@ Ext.define('AM.controller.StockAdjustments', {
 		
     });
   },
+
+	reloadParentStore: function(){
+		console.log("Gonna relaod parent store");
+		this.getStockAdjustmentsStore().load(); 
+		console.log("Gonna refresh stock adjustment ddtail store");
+		
+		console.log("Finish reloading data");
+	},
  
 	onParentDestroy: function(){
 		this.getStockAdjustmentDetailsStore().loadData([],false);
@@ -235,14 +242,18 @@ Ext.define('AM.controller.StockAdjustments', {
   },
 
   deleteParentObject: function() {
-    var record = this.getList().getSelectedObject();
-
-    if (record) {
-      var store = this.getStockAdjustmentsStore();
-      store.remove(record);
+		var parentObject = this.getParentList().getSelectedObject();
+		
+    if (parentObject) {
+	
+      var store = this.getParentList().store;
+      store.remove(parentObject);
       store.sync();
-// to do refresh programmatically
-			this.getList().query('pagingtoolbar')[0].doRefresh();
+			this.getParentList().query('pagingtoolbar')[0].doRefresh();
+			this.getList().store.loadData([],false);
+			
+			this.getParentList().disableRecordButtons();
+			this.getList().disableAddButton();
     }
 
   },
@@ -435,6 +446,11 @@ Ext.define('AM.controller.StockAdjustments', {
 	},
 
 	parentSelectionChange: function(selectionModel, selections) {
+		if( selections.length == 0 ){
+		
+			return; 
+		}
+
 		var me = this; 
     var grid = me.getList();
 		var parentList = me.getParentList();

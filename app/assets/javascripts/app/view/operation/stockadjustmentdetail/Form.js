@@ -95,12 +95,7 @@ Ext.define('AM.view.operation.stockadjustmentdetail.Form', {
 	        xtype: 'textfield',
 	        name : 'quantity',
 	        fieldLabel: 'Quantity'
-	      },
-				{
-					xtype: 'textfield',
-					name : 'description',
-					fieldLabel: 'Deskripsi'
-				}
+	      } 
 				
 			]
     }];
