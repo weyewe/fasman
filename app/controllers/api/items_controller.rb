@@ -100,7 +100,7 @@ class Api::ItemsController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      if params[:parent_id].nil?
+      if params[:parent_id].nil? or params[:parent_id].length == 0 
         @objects = Item.where{ 
                               (sku =~ query)  | 
                               (description =~ query)
