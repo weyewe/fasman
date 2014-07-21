@@ -4,16 +4,14 @@ class Api::ContactsController < Api::BaseApiController
     
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = Contact.active_objects.where{
-        (is_deleted.eq false) & 
+      @objects = Contact.active_objects.where{ 
         (
           (name =~  livesearch )  
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = Contact.active_objects.where{
-        (is_deleted.eq false) & 
+      @total = Contact.active_objects.where{ 
         (
           (name =~  livesearch ) 
         )

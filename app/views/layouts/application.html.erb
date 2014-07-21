@@ -6,6 +6,9 @@
    
   <%= stylesheet_link_tag 'http://cdn.sencha.io/ext-4.1.0-gpl/resources/css/ext-all.css', 'application'       %>
 
+	<%#= stylesheet_link_tag "/extfile/resources/css/ext-all.css" %>
+	<%#= javascript_include_tag   "/extfile/ext-all-debug-w-comments.js"   %>
+	<%#= javascript_include_tag     "application" %>
     
      <% if Rails.env.production? %>
           <%= javascript_include_tag "#{EXT_41_JS}",

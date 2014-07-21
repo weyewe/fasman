@@ -2,6 +2,9 @@ Ticketie::Application.routes.draw do
   devise_for :users
   root :to => 'home#index'
   
+  get 'awesome_image' => 'home#awesome_image', :as => :awesome_image, :method => :get
+  
+  
   
   namespace :api do
     devise_for :users
